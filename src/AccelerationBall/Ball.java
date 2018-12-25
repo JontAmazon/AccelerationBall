@@ -2,7 +2,7 @@ package AccelerationBall;
 
 import java.awt.*;
 
-public class Ball {
+public abstract class Ball {
     protected int INIT_BALL_X;
     protected int INIT_BALL_Y;
     protected double xPos;
@@ -15,13 +15,15 @@ public class Ball {
     protected Image image;
     protected int imageWidth;
     protected int imageHeight;
+    protected boolean isVisible = true;
 
     //Item related attributes:
     protected boolean isInvisible = false;
     protected boolean isEnlarged = false;
-    protected double enlargedBirthTime;
-    protected double immortalityBirthTime;
-    protected double invisibilityBirthTime;
+    protected long enlargedBirthTime;
+    protected long invisibilityBirthTime;
+    protected long stealthTime = 2000;
+    protected long enlargedTime = 5000;
 
 
     public Ball() { }
@@ -56,11 +58,15 @@ public class Ball {
     public double getEnlargedAge() {
         return (System.currentTimeMillis() - enlargedBirthTime);
     }
-    public double getImmortalityAge() {
-        return (System.currentTimeMillis() - immortalityBirthTime);
-    }
     public double getInvisibilityAge() {
         return (System.currentTimeMillis() - invisibilityBirthTime);
+    }
+    public boolean isVisible() {
+        return isVisible;
+    }
+    public void setInvisible() {
+        isVisible = false;
+        invisibilityBirthTime = System.currentTimeMillis();
     }
 
 
@@ -90,4 +96,26 @@ public class Ball {
     }
 
 
+    //Item related:
+    public abstract void enlargen();
+    public abstract void reduce();
+    public void updateEnlarged() {
+        if ((System.currentTimeMillis() - enlargedBirthTime) > enlargedTime) {
+            reduce();
+        }
+    }
+    public void updateVisibility() {
+        if ((System.currentTimeMillis() - invisibilityBirthTime) > stealthTime) {
+            isVisible = true;
+        }
+    }
+
+
+
 }
+
+
+
+
+
+

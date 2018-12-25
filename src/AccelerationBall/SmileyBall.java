@@ -6,6 +6,8 @@ import java.awt.event.KeyEvent;
 public class SmileyBall extends Ball {
     private double speed = 3;
     private boolean isImmortal = false;
+    private long immortalityBirthTime;
+    private long immortalTime = 10000;
 
     public SmileyBall() {
         INIT_BALL_X = 650;
@@ -17,12 +19,6 @@ public class SmileyBall extends Ball {
         imageHeight = image.getHeight(null);
     }
 
-    public boolean isImmortal() {
-        return isImmortal;
-    }
-    public void setImmortal(boolean bool) {
-        isImmortal = bool;
-    }
 
     public void move() {
         super.move();
@@ -70,6 +66,37 @@ public class SmileyBall extends Ball {
             yPos = 0;
         } else if (yPos > Game.HEIGTH - imageHeight - 40) {
             yPos = Game.HEIGTH - imageHeight - 40;
+        }
+    }
+
+
+    //Item related:
+    public boolean isImmortal() {
+        return isImmortal;
+    }
+    public void setImmortal() {
+        isImmortal = true;
+        immortalityBirthTime = System.currentTimeMillis();
+    }
+
+    public void enlargen() {
+        enlargedBirthTime = System.currentTimeMillis();
+        ImageIcon ii = new ImageIcon("src/resources/smiley2_big.png"); //TODO = ändra bild.
+        image = ii.getImage();
+        imageWidth = image.getWidth(null);
+        imageHeight = image.getHeight(null);
+    }
+    public void reduce() {
+        ImageIcon ii = new ImageIcon("src/resources/smiley2_46x41.png");
+        image = ii.getImage();
+        imageWidth = image.getWidth(null);
+        imageHeight = image.getHeight(null);
+    }
+
+    public void updateImmortality() {
+//        if ((System.currentTimeMillis() - immortalityBirthTime) < Board.blinkingConstant) { blink... //TODO
+        if ((System.currentTimeMillis() - immortalityBirthTime) > immortalTime) {
+            isImmortal = false;
         }
     }
 

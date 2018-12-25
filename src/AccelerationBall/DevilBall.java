@@ -13,7 +13,7 @@ public class DevilBall extends Ball {
     //Parameters:
     private final double acceleration = 0.125;
     private final double friction = 0.99;
-    private final double speedLimit = 30;
+    private final double speedLimit = 35;
     private final double orthogonalBounce = 2;
     private final double parallelBounce = 1.2;
 
@@ -28,6 +28,7 @@ public class DevilBall extends Ball {
         imageWidth = image.getWidth(null);
         imageHeight = image.getHeight(null);
     }
+
 
     public void setX(int x) {super.x = x;}
     public void setY(int y) {this.y = y;}
@@ -93,6 +94,22 @@ public class DevilBall extends Ball {
             ydir *= orthogonalBounce;
 //            ydir *= (1 + time/60000);
         }
+    }
+
+
+    //Item related:
+    public void enlargen() {
+        enlargedBirthTime = System.currentTimeMillis();
+        ImageIcon ii = new ImageIcon("src/resources/devil_80x80.png");
+        image = ii.getImage();
+        imageWidth = image.getWidth(null);
+        imageHeight = image.getHeight(null);
+    }
+    public void reduce() {
+        ImageIcon ii = new ImageIcon("src/resources/devil1_41x41.png");
+        image = ii.getImage();
+        imageWidth = image.getWidth(null);
+        imageHeight = image.getHeight(null);
     }
 
 }

@@ -5,7 +5,6 @@ import javax.swing.*;
 public class Enlarger extends Item {
 
     public Enlarger() {
-        super(new ImageIcon("src/resources/apple.png"));
-        //TODO = ÄNDRA BILD
+        super(new ImageIcon("src/resources/plus1_small.png"));
     }
 }

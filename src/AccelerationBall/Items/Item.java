@@ -9,8 +9,10 @@ import java.awt.*;
 import java.util.Random;
 
 public abstract class Item {
-    protected double birthTime;
-    protected boolean consumed;
+    protected long birthTime;
+    protected long lifeTime;
+    protected boolean consumed = false;
+
     protected Image image;
     protected int imageWidth;
     protected int imageHeight;
@@ -43,26 +45,23 @@ public abstract class Item {
     public boolean isConsumed() {
         return consumed;
     }
+    public void consume() {
+        consumed = true;
+    }
     public int getX() {
         return x;
     }
     public int getY() {
         return y;
     }
-
-    public double getAge() {
+    public long getAge() {
         return (System.currentTimeMillis() - birthTime);
     }
+    public long getLife() { return lifeTime; }
 
     public Rectangle getRect() {
         return new Rectangle(x, y,
                 image.getWidth(null), image.getHeight(null));
     }
 
-    public boolean shouldBeRemoved() {
-        return false;
-    }
-
-    //public abstract void checkCollision(SmileyBall smiley, DevilBall devil);
-    //TODO = ta bort nog.
 }

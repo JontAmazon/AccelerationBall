@@ -25,7 +25,9 @@ public class Board extends JPanel {
     private ArrayList<Item> items = new ArrayList<>();
     private Apple apple = new Apple();
     private Integer appleCounter = 0;
-
+    public static final long blinkingConstant = 2000;
+    private Random rand = new Random();
+    private int random = -1;
 
     public Board() {
         smiley = new SmileyBall();
@@ -34,12 +36,12 @@ public class Board extends JPanel {
         addKeyListener(new TAdapter());
         setFocusable(true); //(hmm)
         timer = new Timer();
-        timer.scheduleAtFixedRate(new ScheduleTask(), 2000, 16);
+        timer.scheduleAtFixedRate(new ScheduleTask(), 7000, 16);
 
         items.add(new Fire());
     }
 
-
+    // // // // // // // // // // // // // // // // // //
     private class TAdapter extends KeyAdapter {
         @Override
         public void keyReleased(KeyEvent e) {
@@ -50,8 +52,7 @@ public class Board extends JPanel {
         public void keyPressed(KeyEvent e) {
             smiley.keyPressed(e);
         }
-    }
-
+    }    //
     private class ScheduleTask extends TimerTask {
         @Override
         public void run() {
@@ -59,11 +60,13 @@ public class Board extends JPanel {
             smiley.move();
             devil.move(smiley, time);
             checkCollision();
-            removeFires();
+            updateBallStatuses();
+            updateItems();
+            generateItems();
             repaint();
-//            generateItems(); //TODO = implement
         }
-    }
+    } //
+    // // // // // // // // // // // // // // // // // //
 
     private void checkCollision() {
         if (smiley.getRect().intersects(devil.getRect())) {
@@ -75,22 +78,96 @@ public class Board extends JPanel {
         }
         checkItemCollisions();
     }
-
-    private void gameOver() {
-//        inGame = false;
-//        timer.cancel();
-//        SHOW MENU =)
-        smiley.resetPos();
-        devil.resetPos();
-        appleCounter = 0;
-        items = new ArrayList<>();
+    private void checkItemCollisions() {
+        for (Item item : items) {
+            if (item instanceof Fire) {
+                if (! ((Fire) item).isInPreStatus()) {
+                    if (smiley.getRect().intersects(item.getRect())) {
+                        gameOver();
+                    }
+                }
+            } else if (item instanceof Enlarger) {
+                if (smiley.getRect().intersects(item.getRect())) {
+                    ((Enlarger) item).consume(); //FIXME: kan tas bort?
+                    smiley.enlargen();
+                }
+                if (devil.getRect().intersects(item.getRect())) {
+                    ((Enlarger) item).consume();
+                    devil.enlargen();
+                }
+            } else if (item instanceof Immortality) {
+                if (smiley.getRect().intersects(item.getRect())) {
+                    ((Immortality) item).consume();
+                    smiley.setImmortal();
+                }
+            } else if (item instanceof InvisibilityCloak) {
+                if (smiley.getRect().intersects(item.getRect())) {
+                    ((InvisibilityCloak) item).consume();
+                    smiley.setInvisible();
+                }
+                if (devil.getRect().intersects(item.getRect())) {
+                    ((InvisibilityCloak) item).consume();
+                    devil.setInvisible();
+                }
+            }
+        }
+    }
+    private void updateItems() {
+        for (Item item : items) {
+            if (item.getAge() > item.getLife()) {
+                item.consume();
+            }
+            if (item instanceof Fire && ((Fire)item).isInPreStatus() &&
+                    ((Fire)item).getAge() > ((Fire)item).getPreStatusChangeTime()) {
+                ((Fire)item).changeImage();
+            }
+        }
+        Iterator<Item> it = items.iterator();
+        while (it.hasNext()) {
+            if (it.next().isConsumed()) {
+                it.remove();
+            }
+        }
+    } //TODO = nog HÄR = blinkning.
+    private void updateBallStatuses() {
+        smiley.updateEnlarged();
+        smiley.updateImmortality();
+        smiley.updateVisibility();
+        devil.updateEnlarged();
+        devil.updateVisibility();
+    }
+    private void generateItems() {
+        random = rand.nextInt(1000000/16);
+        //Intervall=100 ==> 0.1 items per sekund.
+        if (random > 1000 && random < 1050) {
+            items.add(new Fire());
+        }
+        if (random > 2000 && random < 2040) {
+            items.add(new Enlarger());
+        }
+        if (random > 3000 && random < 3025) {
+            items.add(new Immortality());
+        }
+        if (random > 4000 && random < 4025) {
+            items.add(new InvisibilityCloak());
+        }
     }
 
     @Override
     public void addNotify() { //TODOO = testa ta bort.
         super.addNotify();
     }
-
+    private void gameOver() {
+//        inGame = false;
+//        timer.cancel();
+//        SHOW MENU =)
+        if (! smiley.isImmortal()) {
+            smiley.resetPos();
+            devil.resetPos();
+            appleCounter = 0;
+            items = new ArrayList<>();
+        }
+    }
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -106,7 +183,6 @@ public class Board extends JPanel {
         }
         Toolkit.getDefaultToolkit().sync();
     }
-
     private void drawObjects(Graphics2D g2d) {
         g2d.drawImage(backgroundImage, 0, 0,
                 Game.WIDTH, Game.HEIGTH, this);
@@ -118,50 +194,20 @@ public class Board extends JPanel {
             g2d.drawImage(item.getImage(), item.getX(), item.getY(),
                     item.getImageWidth(), item.getImageHeight(), this);
         }
-
-        g2d.drawImage(smiley.getImage(), smiley.getX(), smiley.getY(),
-                smiley.getImageWidth(), smiley.getImageHeight(), this);
-        g2d.drawImage(devil.getImage(), devil.getX(), devil.getY(),
-                devil.getImageWidth(), smiley.getImageHeight(), this);
         g2d.drawImage(apple.getImage(), apple.getX(), apple.getY(),
                 apple.getImageWidth(), apple.getImageHeight(), this);
-    }
 
-    private void removeFires() {
-        Iterator<Item> it = items.iterator();
-        while (it.hasNext()) {
-            if (it.next().shouldBeRemoved()) {
-                it.remove();
-            }
+        if (smiley.isVisible()) {
+            g2d.drawImage(smiley.getImage(), smiley.getX(), smiley.getY(),
+                    smiley.getImageWidth(), smiley.getImageHeight(), this);
         }
-    }
-
-    private void checkItemCollisions() {
-        for (Item item : items) {
-            if (item instanceof Fire) {
-                if (! ((Fire) item).isInPreStatus()) {
-                    if (smiley.getRect().intersects(item.getRect())) {
-                        gameOver();
-                    }
-                }
-            } else if (item instanceof Enlarger) {
-                //TODO
-            } else if (item instanceof Immortality) {
-                //TODO
-            } else if (item instanceof InvisibilityCloak) {
-                //TODO
-            }
+        if (devil.isVisible()) {
+            g2d.drawImage(devil.getImage(), devil.getX(), devil.getY(),
+                    devil.getImageWidth(), smiley.getImageHeight(), this);
         }
-
-
     }
 
 }
-
-
-
-
-
 
 
 
