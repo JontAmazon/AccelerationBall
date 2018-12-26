@@ -10,20 +10,12 @@ public class SmileyBall extends Ball {
     private long immortalTime = 10000;
 
     public SmileyBall() {
+        super(new ImageIcon("src/resources/smiley2_46x41.png"));
         INIT_BALL_X = 650;
         INIT_BALL_Y = 350;
         resetPos();
-        ImageIcon ii = new ImageIcon("src/resources/smiley2_46x41.png");
-        image = ii.getImage();
-        imageWidth = image.getWidth(null);
-        imageHeight = image.getHeight(null);
     }
 
-
-    public void move() {
-        super.move();
-        restrictAtWalls();
-    }
 
     public void keyPressed (KeyEvent e){
         int key = e.getKeyCode();
@@ -55,7 +47,10 @@ public class SmileyBall extends Ball {
             ydir = 0;
         }
     }
-
+    public void move() {
+        super.move();
+        restrictAtWalls();
+    }
     private void restrictAtWalls() {
         if (xPos < 0) {
             xPos = 0;
@@ -69,7 +64,6 @@ public class SmileyBall extends Ball {
         }
     }
 
-
     //Item related:
     public boolean isImmortal() {
         return isImmortal;
@@ -78,21 +72,20 @@ public class SmileyBall extends Ball {
         isImmortal = true;
         immortalityBirthTime = System.currentTimeMillis();
     }
-
     public void enlargen() {
         enlargedBirthTime = System.currentTimeMillis();
-        ImageIcon ii = new ImageIcon("src/resources/smiley2_big.png"); //TODO = ändra bild.
+        ImageIcon ii = new ImageIcon("src/resources/smiley2_big.png");
         image = ii.getImage();
         imageWidth = image.getWidth(null);
         imageHeight = image.getHeight(null);
     }
     public void reduce() {
+        isEnlarged = false;
         ImageIcon ii = new ImageIcon("src/resources/smiley2_46x41.png");
         image = ii.getImage();
         imageWidth = image.getWidth(null);
         imageHeight = image.getHeight(null);
     }
-
     public void updateImmortality() {
 //        if ((System.currentTimeMillis() - immortalityBirthTime) < Board.blinkingConstant) { blink... //TODO
         if ((System.currentTimeMillis() - immortalityBirthTime) > immortalTime) {

@@ -3,6 +3,9 @@ package AccelerationBall;
 import javax.swing.*;
 
 public class DevilBall extends Ball {
+    //Ghost attributes:
+    private boolean facesRight = true;
+
     //Direction of acceleration:
     private double xDist;
     private double yDist;
@@ -10,49 +13,45 @@ public class DevilBall extends Ball {
     private double xQuota;
     private double yQuota;
 
-    //Parameters:
-    private final double acceleration = 0.125;
-    private final double friction = 0.99;
-    private final double speedLimit = 35;
-    private final double orthogonalBounce = 2;
-    private final double parallelBounce = 1.2;
+    //Devil parameters:
+    private double acceleration = 0.118;
+    private double friction = 0.991;
+    private double orthogonalBounce = 2;
+    private double parallelBounce = 1.18;
+    private double speedLimit = 35;
+    //Ghost parameters:
+    private static final double startingSpeedLimit = 0.5;
+    public static double getStartingSpeedLimit() { return startingSpeedLimit; }
+    private final double linearSpeedTimeFactor = 0.000020;
+    private final double maxSpeedLimit = 1; //TODO = bra siffra?
+                                            //EV TODO = nog införa timeToReachMaxSpeed;
+//    private final double logarithmicSpeedTimeFactor = 0.000030;
+//    private final double logarithm = 2;
 
 
-    public DevilBall() {
+    public DevilBall(ImageIcon imageIcon, double acceleration, double friction,
+                     double speedLimit, double orthogonalBounce, double parallelBounce,
+                     int INIT_X, int INIT_Y) {
+        this(imageIcon);
+        this.acceleration = acceleration;
+        this.friction = friction;
+        this.speedLimit = speedLimit;
+        this.orthogonalBounce = orthogonalBounce;
+        this.parallelBounce = parallelBounce;
+        INIT_BALL_X = INIT_X;
+        INIT_BALL_Y = INIT_Y;
+        resetPos();
+    }
+    public DevilBall(ImageIcon imageIcon) {
+        super(imageIcon);
         INIT_BALL_X = 100;
         INIT_BALL_Y = 350;
         resetPos();
-
-        ImageIcon ii = new ImageIcon("src/resources/devil1_41x41.png");
-        image = ii.getImage();
-        imageWidth = image.getWidth(null);
-        imageHeight = image.getHeight(null);
     }
 
 
-    public void setX(int x) {super.x = x;}
-    public void setY(int y) {this.y = y;}
-    public double getXdirection() {
-        return xdir;
-    }
-    public double getYdirection() {
-        return ydir;
-    }
-
-    private void restrictSpeed() {
-        if (xdir > speedLimit) {
-            xdir = speedLimit;
-        } else if (xdir < -speedLimit) {
-            xdir = -speedLimit;
-        }
-        if (ydir > speedLimit) {
-            ydir = speedLimit;
-        } else if (ydir < -speedLimit) {
-            ydir = -speedLimit;
-        }
-    }
-    public void move(SmileyBall smiley, double time) { //TODO = ta bort "setDirection..."
-        //calculate direction of accelerat
+    public void move(SmileyBall smiley, double time) {
+        //calculate direction of acceleration.
         xDist = smiley.getXpos() - xPos;
         yDist = smiley.getYpos() - yPos;
         distance = Math.sqrt(xDist * xDist + yDist * yDist);
@@ -65,9 +64,9 @@ public class DevilBall extends Ball {
         ydir *= friction;
         restrictSpeed();
         super.move();
-        bounceAtWalls(time);
+        bounceIfAtWalls(time);
     }
-    private void bounceAtWalls(double time) {
+    private void bounceIfAtWalls(double time) {
         if (xPos < 0) {
             xPos = 0;
             xdir *= -1;
@@ -97,20 +96,77 @@ public class DevilBall extends Ball {
     }
 
 
+    //Ghost methods:
+    private void restrictSpeed() { //EV TODO = nu rör sig spöket som mig:
+        // lika snabbt i X och Y-led. EV Ändra.
+        if (xdir > speedLimit) {
+            xdir = speedLimit;
+        } else if (xdir < -speedLimit) {
+            xdir = -speedLimit;
+        }
+        if (ydir > speedLimit) {
+            ydir = speedLimit;
+        } else if (ydir < -speedLimit) {
+            ydir = -speedLimit;
+        }
+    }
+    public void speedUp(long age) {
+        if (isGhost()) {
+            if (speedLimit < maxSpeedLimit) {
+                double seconds = (age/1000);
+                speedLimit += (seconds * linearSpeedTimeFactor);
+                //speedLimit += (seconds * logarithmicSpeedTimeFactor * Math.log(age) / Math.log(logarithm));
+            }
+        }
+    }
+    public void turnGhosts(SmileyBall smiley) {
+        if (isGhost()) {
+            if (facesRight && ! shouldFaceRight(smiley)) {
+                facesRight = false;
+                //face left:
+                ImageIcon imageIcon = new ImageIcon("src/resources/ghost1_44x39.png");
+                image = imageIcon.getImage();
+                imageWidth = image.getWidth(null);
+                imageHeight = image.getHeight(null);
+            } else if (!facesRight && shouldFaceRight(smiley)) {
+                facesRight = true;
+                //face right:
+                ImageIcon imageIcon = new ImageIcon("src/resources/ghost1_44x39-converted.png");
+                image = imageIcon.getImage();
+                imageWidth = image.getWidth(null);
+                imageHeight = image.getHeight(null);
+            }
+        }
+    }
+    private boolean shouldFaceRight(SmileyBall smiley) { return (smiley.getX() > x); }
+
+
     //Item related:
     public void enlargen() {
-        enlargedBirthTime = System.currentTimeMillis();
-        ImageIcon ii = new ImageIcon("src/resources/devil_80x80.png");
-        image = ii.getImage();
-        imageWidth = image.getWidth(null);
-        imageHeight = image.getHeight(null);
+        if (isDevil()) {
+            enlargedBirthTime = System.currentTimeMillis();
+            ImageIcon ii = new ImageIcon("src/resources/devil_80x80.png");
+            image = ii.getImage();
+            imageWidth = image.getWidth(null);
+            imageHeight = image.getHeight(null);
+        } else if (isGhost()) {
+            //nothing
+        }
     }
     public void reduce() {
-        ImageIcon ii = new ImageIcon("src/resources/devil1_41x41.png");
-        image = ii.getImage();
-        imageWidth = image.getWidth(null);
-        imageHeight = image.getHeight(null);
+        isEnlarged = false;
+        if (isDevil()) {
+            ImageIcon ii = new ImageIcon("src/resources/devil1_41x41.png");
+            image = ii.getImage();
+            imageWidth = image.getWidth(null);
+            imageHeight = image.getHeight(null);
+        } else if (isGhost()) {
+            //nothing.
+        }
     }
+    public boolean isDevil() { return (acceleration < 0.49); }
+    public boolean isGhost() { return (acceleration > 0.49); }
+
 
 }
 

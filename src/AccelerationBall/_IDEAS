@@ -1,25 +1,28 @@
-//TODO=NOTES________________________
+________NOTES________________________
 - Om jag vill ha flera devils kan jag implementera en konstruktur där vissa parametrar slumpas fram.
 - Kan få saker att blinka om jag dividerar Board.getAge() med något tal.
 
 
-//TODO=TODOS________________________
-1. Implementera Idea 1 och 2.
+________TODOS________________________
 
 
 
 
 
 
-//TODO=IDEAS_________________________
-1a. Orienteringskontroller.
-1b. Vid 50 poäng, kommer man till en ny värld.
-2. Om man inte tar orienteringskontrollen snabbt växer djävulen.
-3. Items
-    - farliga eld-zoner. den växer under 2s och sen aktiv under 5s.
-    - man blir större
-    - osynlig i tre sekunder
-    - odödlig under 10s - musik från Super Mario
+________IDEAS_________________________
+***General ideas***
+- Vid 30 äpplen kommer man till nästa värld.
+- Om man inte tar orienteringskontrollen snabbt växer djävulen.
+
+
+
+***Spöke+Devil***
+- Logaritmisk funktion för spökets fart.
+
+
+
+***Items***
     - +1 devil balls under 7s/tills den studsar
  EV - djävulen ökar sin studs i 3 sekunder
  EV - halvera farten
