@@ -23,8 +23,8 @@ public abstract class Ball {
     protected boolean isEnlarged = false;
     protected long enlargedBirthTime;
     protected long invisibilityBirthTime;
-    protected long stealthTime = 1000*1;
-    protected long enlargedTime = 1000*11;
+    protected final long stealthTime = 1000*1;
+    protected final long enlargedTime = 1000*11;
 
 
     public Ball(ImageIcon imageIcon) {

@@ -16,6 +16,9 @@ public class Board extends JPanel {
     private SmileyBall smiley;
     private DevilBall ghost;
     private DevilBall devil;
+    private int frenzyCounter = 0;
+    private long frenzyTimeCounter = 0;
+    private long frenzyStrike = 3500;
     private ArrayList<DevilBall> enemies = new ArrayList<>();
     private long birthTime = System.currentTimeMillis();
     private long time = birthTime;
@@ -36,7 +39,7 @@ public class Board extends JPanel {
     public Board() {
         smiley = new SmileyBall();
         devil = new DevilBall(new ImageIcon("src/resources/devil1_41x41.png"));
-        ghost = new DevilBall(new ImageIcon("src/resources/ghost1_44x39-converted.png"), 100 / 100000,
+        ghost = new DevilBall(new ImageIcon("src/resources/ghost1_44x39-converted.png"), 100,
                 0.1, DevilBall.getStartingSpeedLimit(), 1, 1, 130, 500);
         enemies.add(ghost);
         enemies.add(devil);
@@ -83,10 +86,11 @@ public class Board extends JPanel {
     } ///////
     ////////////////////////////////////////////////////////
     // TODO = Menu
-    // TODO = Super Mario-musik
-    // TODO = nytt item:   halvera djävulens fart
-    // TODO = - Varje äpple måste tas inom 5s,
-    // efter 3 missar (POP-UP = "STRIKE 1"!) kommer djävulen in i en Frenzy (LJUD: "FRENZY!"): studsfaktor 2.5
+    // TODO = Bakgrundsmusik + Super Mario-musik + EV frenzy-musik
+    // TODO = nytt item:   halvera djävulens fart (EV ikon: grön -)
+    // TODO = implementera ny intersect().
+    // TODO = create a Ghost class.
+
 
     private void checkCollision() {
         for (DevilBall devil : enemies) {
@@ -96,6 +100,7 @@ public class Board extends JPanel {
         }
         if (smiley.getRect().intersects(apple.getRect())) {
             appleCounter++;
+            frenzyTimeCounter = 0;
             apple = new Apple();
         }
     }
@@ -103,12 +108,30 @@ public class Board extends JPanel {
         smiley.updateEnlarged();
         smiley.updateImmortality();
         smiley.updateVisibility();
+
         for (DevilBall devil : enemies) {
             devil.updateEnlarged();
             devil.updateVisibility();
             if (devil.isGhost()) {
                 devil.turnGhosts(smiley);
                 devil.speedUp(time-birthTime);
+            } else if (devil.isDevil()) {
+                frenzyTimeCounter += 10;
+                if (frenzyTimeCounter > frenzyStrike) {
+                    frenzyTimeCounter = 0;
+                    if (! devil.isInFrenzy()) {
+                        frenzyCounter += 1;
+                        apple = new Apple();
+                    }
+                }
+                if (frenzyCounter == 3) {
+                    frenzyCounter = 0;
+                    devil.frenzy();
+                }
+                if (devil.isInFrenzy() && (time - devil.getFrenzyBirthTime()) > devil.getFrenzyTime()) {
+                    frenzyTimeCounter = 0;
+                    devil.stopFrenzy();
+                }
             }
         }
     }
@@ -119,14 +142,14 @@ public class Board extends JPanel {
             Fire fire = new Fire();
             addIfNotIntersects(fire);
         }
-        if (random > 2000 && random < 2010) {
-            Enlarger enlarger = new Enlarger();
-            addIfNotIntersects(enlarger);
-        }
         if (random > 3000 && random < 3005) {
             Immortality flask = new Immortality();
             addIfNotIntersects(flask);
         }
+//        if (random > 2000 && random < 2010) {
+//            Enlarger enlarger = new Enlarger();
+//            addIfNotIntersects(enlarger);
+//        }
 //        if (random > 4000 && random < 4005) {
 //                InvisibilityCloak cloak = new InvisibilityCloak();
 //                addIfNotIntersects(cloak);
@@ -214,6 +237,8 @@ public class Board extends JPanel {
             enemies.add(ghost);
             enemies.add(devil);
             items = new ArrayList<>();
+            frenzyCounter = 0;
+            frenzyTimeCounter = 0;
 
             appleCounter = 0;
             birthTime = System.currentTimeMillis();

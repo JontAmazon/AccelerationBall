@@ -4,7 +4,7 @@ import javax.swing.*;
 
 public class Fire extends Item {
     private boolean preStatus = true;
-    private long preStatusChangeTime = 1000*3;
+    private final long preStatusChangeTime = 1000*3;
     private boolean isInPreStatus1 = true;
     private boolean isInPreStatus2 = false;
     private boolean isInPreStatus3 = false;

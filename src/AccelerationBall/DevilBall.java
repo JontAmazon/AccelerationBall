@@ -14,10 +14,18 @@ public class DevilBall extends Ball {
     private double yQuota;
 
     //Devil parameters:
-    private double acceleration = 0.118 / 1000;
-    private double friction = 0.991;
+    private double acceleration = 0.115;
+    private final double normalAcceleration = 0.115;
+    private final double frenzyAcceleration = 0.115 * 1.3;
     private double orthogonalBounce = 2;
+    private final double normalBounce = 2;
+    private final double frenzyBounce = 2;
+    private long frenzyBirthTime;
+    private final long frenzyTime = 1000*8;
+    private boolean isInFrenzy = false;
+
     private double parallelBounce = 1.18;
+    private double friction = 0.991;
     private double speedLimit = 35;
     //Ghost parameters:
     private static final double startingSpeedLimit = 0.5;
@@ -93,6 +101,33 @@ public class DevilBall extends Ball {
             ydir *= orthogonalBounce;
 //            ydir *= (1 + time/60000);
         }
+    }
+
+
+    //Devil methods:
+    public long getFrenzyBirthTime() { return frenzyBirthTime; }
+    public long getFrenzyTime() { return frenzyTime; }
+    public boolean isInFrenzy() { return isInFrenzy; }
+    public void frenzy() {
+        isInFrenzy = true;
+        frenzyBirthTime = System.currentTimeMillis();
+        orthogonalBounce = frenzyBounce;
+        acceleration = frenzyAcceleration;
+
+        ImageIcon ii = new ImageIcon("src/resources/devil_80x80.png");
+        image = ii.getImage();
+        imageWidth = image.getWidth(null);
+        imageHeight = image.getHeight(null);
+    }
+    public void stopFrenzy() {
+        isInFrenzy = false;
+        orthogonalBounce = normalBounce;
+        acceleration = normalAcceleration;
+
+        ImageIcon ii = new ImageIcon("src/resources/devil1_41x41.png");
+        image = ii.getImage();
+        imageWidth = image.getWidth(null);
+        imageHeight = image.getHeight(null);
     }
 
 
