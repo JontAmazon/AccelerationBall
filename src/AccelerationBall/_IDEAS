@@ -1,36 +1,16 @@
-________NOTES________________________
-- Om jag vill ha flera devils kan jag implementera en konstruktur där vissa parametrar slumpas fram.
-- Kan få saker att blinka om jag dividerar Board.getAge() med något tal.
-
-
-________TODOS________________________
-
-
-
-
-
-
 ________IDEAS_________________________
+
+
 ***General ideas***
 - Vid 30 äpplen kommer man till nästa värld.
-- Om man inte tar orienteringskontrollen snabbt växer djävulen.
-
-
-
-***Spöke+Devil***
-- Logaritmisk funktion för spökets fart.
-
+- Varje äpple måste tas inom 5s, annars efter 3 missar (POP-UP = "STRIKE 1"!) kommer djävulen in i en Frenzy: studsfaktor 2.5
 
 
 ***Items***
-    - +1 devil balls under 7s/tills den studsar
- EV - djävulen ökar sin studs i 3 sekunder
- EV - halvera farten
-    - efter 3 specialitems kommer djävulen in i en Frenzy!
-
-(Nja) 3. Något objekt i mitten!
-(Nja) 4. Vinklade kanter i hörnen.
+____FLER POSITIVA ITEMS!____
+- halvera djävulens fart
 
 
-
+***(Nja)***
+- Något objekt i mitten!
 

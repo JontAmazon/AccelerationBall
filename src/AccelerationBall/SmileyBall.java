@@ -7,7 +7,7 @@ public class SmileyBall extends Ball {
     private double speed = 3;
     private boolean isImmortal = false;
     private long immortalityBirthTime;
-    private long immortalTime = 10000;
+    private long immortalTime = 1000*10;
 
     public SmileyBall() {
         super(new ImageIcon("src/resources/smiley2_46x41.png"));
@@ -72,7 +72,15 @@ public class SmileyBall extends Ball {
         isImmortal = true;
         immortalityBirthTime = System.currentTimeMillis();
     }
+    public void updateImmortality() {
+//        if ((System.currentTimeMillis() - immortalityBirthTime) < Board.blinkingConstant) { blink... //TODO
+        if ((System.currentTimeMillis() - immortalityBirthTime) > immortalTime) {
+            isImmortal = false;
+        }
+    }
+
     public void enlargen() {
+        isEnlarged = true;
         enlargedBirthTime = System.currentTimeMillis();
         ImageIcon ii = new ImageIcon("src/resources/smiley2_big.png");
         image = ii.getImage();
@@ -85,12 +93,6 @@ public class SmileyBall extends Ball {
         image = ii.getImage();
         imageWidth = image.getWidth(null);
         imageHeight = image.getHeight(null);
-    }
-    public void updateImmortality() {
-//        if ((System.currentTimeMillis() - immortalityBirthTime) < Board.blinkingConstant) { blink... //TODO
-        if ((System.currentTimeMillis() - immortalityBirthTime) > immortalTime) {
-            isImmortal = false;
-        }
     }
 
 }

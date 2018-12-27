@@ -36,7 +36,7 @@ public class Board extends JPanel {
     public Board() {
         smiley = new SmileyBall();
         devil = new DevilBall(new ImageIcon("src/resources/devil1_41x41.png"));
-        ghost = new DevilBall(new ImageIcon("src/resources/ghost1_44x39-converted.png"), 100,
+        ghost = new DevilBall(new ImageIcon("src/resources/ghost1_44x39-converted.png"), 100 / 100000,
                 0.1, DevilBall.getStartingSpeedLimit(), 1, 1, 130, 500);
         enemies.add(ghost);
         enemies.add(devil);
@@ -72,17 +72,21 @@ public class Board extends JPanel {
                 devil.move(smiley, time-birthTime);
             }
             checkCollision();
-            //checkItemCollisions();
             updateBallStatuses();
-            //updateItems();
-            //generateItems();
+
+            generateItems();
+            checkItemCollisions();
+            updateItems();
+
             repaint();
             }
     } ///////
-    // // // // // // // // // // // // // // // // // // //
-    //////////////////////////////////////////////////////
-    //TODO = items dyker upp och tas bort efter ca 3 frames.
-    //TODO = blinkning.
+    ////////////////////////////////////////////////////////
+    // TODO = Menu
+    // TODO = Super Mario-musik
+    // TODO = nytt item:   halvera djävulens fart
+    // TODO = - Varje äpple måste tas inom 5s,
+    // efter 3 missar (POP-UP = "STRIKE 1"!) kommer djävulen in i en Frenzy (LJUD: "FRENZY!"): studsfaktor 2.5
 
     private void checkCollision() {
         for (DevilBall devil : enemies) {
@@ -94,6 +98,47 @@ public class Board extends JPanel {
             appleCounter++;
             apple = new Apple();
         }
+    }
+    private void updateBallStatuses() {
+        smiley.updateEnlarged();
+        smiley.updateImmortality();
+        smiley.updateVisibility();
+        for (DevilBall devil : enemies) {
+            devil.updateEnlarged();
+            devil.updateVisibility();
+            if (devil.isGhost()) {
+                devil.turnGhosts(smiley);
+                devil.speedUp(time-birthTime);
+            }
+        }
+    }
+    private void generateItems() {
+        random = rand.nextInt(1000000/16);
+        //Intervall=100 ==> 1 item var tioende sekund.
+        if (random > 1000 && random < 1090) {
+            Fire fire = new Fire();
+            addIfNotIntersects(fire);
+        }
+        if (random > 2000 && random < 2010) {
+            Enlarger enlarger = new Enlarger();
+            addIfNotIntersects(enlarger);
+        }
+        if (random > 3000 && random < 3005) {
+            Immortality flask = new Immortality();
+            addIfNotIntersects(flask);
+        }
+//        if (random > 4000 && random < 4005) {
+//                InvisibilityCloak cloak = new InvisibilityCloak();
+//                addIfNotIntersects(cloak);
+//        }
+    }
+    private void addIfNotIntersects(Item newItem) {
+        for (Item item : items) {
+            if (newItem.getRect().intersects(item.getRect())) {
+                return;
+            }
+        }
+        items.add(newItem);
     }
     private void checkItemCollisions() {
         for (Item item : items) {
@@ -134,6 +179,8 @@ public class Board extends JPanel {
         }
     }
     private void updateItems() {
+        //NOTE = includes removing consumed items.
+
         for (Item item : items) {
             if (item.getAge() > item.getLife()) {
                 item.consume();
@@ -149,35 +196,6 @@ public class Board extends JPanel {
                 it.remove();
             }
         }
-    } //TODO = nog HÄR = blinkning.
-    private void updateBallStatuses() {
-        smiley.updateEnlarged();
-        smiley.updateImmortality();
-        smiley.updateVisibility();
-        for (DevilBall devil : enemies) {
-            devil.updateEnlarged();
-            devil.updateVisibility();
-            if (devil.isGhost()) {
-                devil.turnGhosts(smiley);
-                devil.speedUp(time-birthTime);
-            }
-        }
-    }
-    private void generateItems() {
-        random = rand.nextInt(1000000/16);
-        //Intervall=100 ==> 0.1 items per sekund.
-        if (random > 1000 && random < 1050) {
-            items.add(new Fire());
-        }
-        if (random > 2000 && random < 2040) {
-            items.add(new Enlarger());
-        }
-        if (random > 3000 && random < 3025) {
-            items.add(new Immortality());
-        }
-        if (random > 4000 && random < 4025) {
-            items.add(new InvisibilityCloak());
-        }
     }
 
     private void gameOver() {
@@ -187,13 +205,7 @@ public class Board extends JPanel {
             //inGame = false;
             //timer.cancel();
             //SHOW MENU =)
-//            smiley.resetPos();
-//            for (DevilBall devil : enemies) {
-//                devil.resetPos();
-//                if (devil.isGhost()) {
-//                    devil.resetSpeed();
-//                }
-//            }
+
             smiley = new SmileyBall();
             devil = new DevilBall(new ImageIcon("src/resources/devil1_41x41.png"));
             ghost = new DevilBall(new ImageIcon("src/resources/ghost1_44x39-converted.png"), 100,
@@ -201,8 +213,9 @@ public class Board extends JPanel {
             enemies = new ArrayList<>();
             enemies.add(ghost);
             enemies.add(devil);
-            appleCounter = 0;
             items = new ArrayList<>();
+
+            appleCounter = 0;
             birthTime = System.currentTimeMillis();
             time = birthTime;
         }

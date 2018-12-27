@@ -10,6 +10,7 @@ public class Portal extends Item {
 
     public Portal(ImageIcon imageIcon) {
         super(new ImageIcon("src/resources/apple.png"));
+        lifeTime = 10000000;
         //ÄNDRA BILD
     }
 

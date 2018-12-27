@@ -4,17 +4,33 @@ import javax.swing.*;
 
 public class Fire extends Item {
     private boolean preStatus = true;
-    private long preStatusChangeTime = 2000;
+    private long preStatusChangeTime = 1000*3;
+    private boolean isInPreStatus1 = true;
+    private boolean isInPreStatus2 = false;
+    private boolean isInPreStatus3 = false;
+
 
 
     public Fire() {
-        super(new ImageIcon("src/resources/preFire.png"));
-        lifeTime = 7000;
+        super(new ImageIcon("src/resources/fire3_1rings_starz.png"));
+        lifeTime = 1000*10;
     }
 
     public boolean isInPreStatus() {
+        if (isInPreStatus1 && getAge() > 1000) {
+            ImageIcon imageIcon = new ImageIcon("src/resources/fire3_2rings_starz.png");
+            image = imageIcon.getImage();
+            isInPreStatus1 = false;
+            isInPreStatus2 = true;
+        } else if (isInPreStatus2 && getAge() > 2000) {
+            ImageIcon imageIcon = new ImageIcon("src/resources/fire3_3rings_starz.png");
+            image = imageIcon.getImage();
+            isInPreStatus2 = false;
+            isInPreStatus3 = true;
+        }
+
         return preStatus;
-    }
+    } //Note: changes the 3 ring images.
 
     public long getPreStatusChangeTime() {
         return preStatusChangeTime;
@@ -22,7 +38,7 @@ public class Fire extends Item {
 
     public void changeImage() {
         preStatus = false;
-        ImageIcon imageIcon = new ImageIcon("src/resources/fire3_225x225.png");
+        ImageIcon imageIcon = new ImageIcon("src/resources/fire3_225x225_starz.png");
         image = imageIcon.getImage();
     }
 }

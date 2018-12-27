@@ -23,8 +23,8 @@ public abstract class Ball {
     protected boolean isEnlarged = false;
     protected long enlargedBirthTime;
     protected long invisibilityBirthTime;
-    protected long stealthTime = 2000;
-    protected long enlargedTime = 5000;
+    protected long stealthTime = 1000*1;
+    protected long enlargedTime = 1000*11;
 
 
     public Ball(ImageIcon imageIcon) {
@@ -50,12 +50,6 @@ public abstract class Ball {
     protected Image getImage() { return image; }
     public int getImageWidth() { return imageWidth; }
     public int getImageHeight() { return imageHeight; }
-    public boolean isInvisible() { return isInvisible; }
-    public void setInvisibility(boolean bool) { isInvisible = bool; }
-    public boolean isEnlarged() { return isEnlarged; }
-    public void setEnlarged(boolean bool) { isEnlarged = bool; }
-    public double getEnlargedAge() { return (System.currentTimeMillis() - enlargedBirthTime); }
-    public double getInvisibilityAge() { return (System.currentTimeMillis() - invisibilityBirthTime); }
     public boolean isVisible() { return isVisible; }
     public void setInvisible() {
         isVisible = false;

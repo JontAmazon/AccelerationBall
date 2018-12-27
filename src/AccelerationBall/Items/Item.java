@@ -23,9 +23,8 @@ public abstract class Item {
 
     public Item(ImageIcon imageIcon) {
         birthTime = System.currentTimeMillis();
-        consumed = false;
-        x = rand.nextInt(Game.WIDTH-90);
-        y = rand.nextInt(Game.HEIGTH-90);
+        x = rand.nextInt(Game.WIDTH-200);
+        y = rand.nextInt(Game.HEIGTH-200);
 
         image = imageIcon.getImage();
         imageWidth = image.getWidth(null);

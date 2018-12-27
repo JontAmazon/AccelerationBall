@@ -14,7 +14,7 @@ public class DevilBall extends Ball {
     private double yQuota;
 
     //Devil parameters:
-    private double acceleration = 0.118;
+    private double acceleration = 0.118 / 1000;
     private double friction = 0.991;
     private double orthogonalBounce = 2;
     private double parallelBounce = 1.18;
@@ -22,9 +22,9 @@ public class DevilBall extends Ball {
     //Ghost parameters:
     private static final double startingSpeedLimit = 0.5;
     public static double getStartingSpeedLimit() { return startingSpeedLimit; }
-    private final double linearSpeedTimeFactor = 0.000020;
-    private final double maxSpeedLimit = 1; //TODO = bra siffra?
-                                            //EV TODO = nog införa timeToReachMaxSpeed;
+    private final double linearSpeedTimeFactor = 0.000008;
+    private final double maxSpeedLimit = 0.90;
+    private final double timeToReachMaxSpeed = 1000*120;
 //    private final double logarithmicSpeedTimeFactor = 0.000030;
 //    private final double logarithm = 2;
 
@@ -113,8 +113,11 @@ public class DevilBall extends Ball {
     public void speedUp(long age) {
         if (isGhost()) {
             if (speedLimit < maxSpeedLimit) {
-                double seconds = (age/1000);
-                speedLimit += (seconds * linearSpeedTimeFactor);
+                double totalIncrease = maxSpeedLimit - startingSpeedLimit;
+                double increasePerMilliSecond = totalIncrease / timeToReachMaxSpeed;
+                speedLimit = startingSpeedLimit + age * increasePerMilliSecond;
+
+                //Logarithmic:
                 //speedLimit += (seconds * logarithmicSpeedTimeFactor * Math.log(age) / Math.log(logarithm));
             }
         }
@@ -144,6 +147,7 @@ public class DevilBall extends Ball {
     //Item related:
     public void enlargen() {
         if (isDevil()) {
+            isEnlarged = true;
             enlargedBirthTime = System.currentTimeMillis();
             ImageIcon ii = new ImageIcon("src/resources/devil_80x80.png");
             image = ii.getImage();
