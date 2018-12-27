@@ -10,16 +10,15 @@ import java.util.Timer;
 import javax.swing.*;
 
 public class Board extends JPanel {
-    private Timer timer;
     private boolean inGame;
-    private String message = "Game Over";
     private SmileyBall smiley;
-    private DevilBall ghost;
+    private GhostBall ghost;
     private DevilBall devil;
     private int frenzyCounter = 0;
     private long frenzyTimeCounter = 0;
-    private long frenzyStrike = 3500;
-    private ArrayList<DevilBall> enemies = new ArrayList<>();
+    private long frenzyStrike = 4500;
+
+    private Timer timer;
     private long birthTime = System.currentTimeMillis();
     private long time = birthTime;
     ImageIcon ii = new ImageIcon("src/resources/background2.png");
@@ -31,18 +30,14 @@ public class Board extends JPanel {
     private ArrayList<Item> items = new ArrayList<>();
     private Apple apple = new Apple();
     private Integer appleCounter = 0;
-    public static final long blinkingConstant = 2000;
     private Random rand = new Random();
     private int random = -1;
 
 
     public Board() {
         smiley = new SmileyBall();
-        devil = new DevilBall(new ImageIcon("src/resources/devil1_41x41.png"));
-        ghost = new DevilBall(new ImageIcon("src/resources/ghost1_44x39-converted.png"), 100,
-                0.1, DevilBall.getStartingSpeedLimit(), 1, 1, 130, 500);
-        enemies.add(ghost);
-        enemies.add(devil);
+        ghost = new GhostBall();
+        devil = new DevilBall();
         inGame = true;
         addKeyListener(new TAdapter());
         setFocusable(true); //(hmm)
@@ -71,9 +66,8 @@ public class Board extends JPanel {
         public void run() {
             time += 10;
             smiley.move();
-            for (DevilBall devil : enemies) {
-                devil.move(smiley, time-birthTime);
-            }
+            ghost.move(smiley);
+            devil.move(smiley);
             checkCollision();
             updateBallStatuses();
 
@@ -86,18 +80,22 @@ public class Board extends JPanel {
     } ///////
     ////////////////////////////////////////////////////////
     // TODO = Menu
+    // TODO = gameOver():  wait(2000).
     // TODO = Bakgrundsmusik + Super Mario-musik + EV frenzy-musik
     // TODO = nytt item:   halvera djävulens fart (EV ikon: grön -)
     // TODO = implementera ny intersect().
     // TODO = create a Ghost class.
+    // TODO = pusha
 
 
     private void checkCollision() {
-        for (DevilBall devil : enemies) {
-            if (smiley.getRect().intersects(devil.getRect())) {
-                gameOver();
-            }
+        if (smiley.getRect().intersects(ghost.getRect())) {
+            gameOver();
         }
+        if (smiley.getRect().intersects(devil.getRect())) {
+            gameOver();
+        }
+
         if (smiley.getRect().intersects(apple.getRect())) {
             appleCounter++;
             frenzyTimeCounter = 0;
@@ -105,34 +103,27 @@ public class Board extends JPanel {
         }
     }
     private void updateBallStatuses() {
-        smiley.updateEnlarged();
         smiley.updateImmortality();
-        smiley.updateVisibility();
 
-        for (DevilBall devil : enemies) {
-            devil.updateEnlarged();
-            devil.updateVisibility();
-            if (devil.isGhost()) {
-                devil.turnGhosts(smiley);
-                devil.speedUp(time-birthTime);
-            } else if (devil.isDevil()) {
-                frenzyTimeCounter += 10;
-                if (frenzyTimeCounter > frenzyStrike) {
-                    frenzyTimeCounter = 0;
-                    if (! devil.isInFrenzy()) {
-                        frenzyCounter += 1;
-                        apple = new Apple();
-                    }
-                }
-                if (frenzyCounter == 3) {
-                    frenzyCounter = 0;
-                    devil.frenzy();
-                }
-                if (devil.isInFrenzy() && (time - devil.getFrenzyBirthTime()) > devil.getFrenzyTime()) {
-                    frenzyTimeCounter = 0;
-                    devil.stopFrenzy();
-                }
-            }
+        ghost.turnGhosts(smiley);
+        ghost.speedUp(time-birthTime);
+
+        //devil:
+        if (! devil.isInFrenzy()) {
+            frenzyTimeCounter += 10;
+        }
+        if (frenzyTimeCounter > frenzyStrike) {
+            frenzyTimeCounter = 0;
+            frenzyCounter++;
+            apple = new Apple();
+        }
+        if (frenzyCounter == 3) {
+            frenzyTimeCounter = 0;
+            frenzyCounter = 0;
+            devil.frenzy();
+        }
+        if (devil.isInFrenzy() && (time - devil.getFrenzyBirthTime()) > devil.getFrenzyTime()) {
+            devil.stopFrenzy();
         }
     }
     private void generateItems() {
@@ -146,14 +137,6 @@ public class Board extends JPanel {
             Immortality flask = new Immortality();
             addIfNotIntersects(flask);
         }
-//        if (random > 2000 && random < 2010) {
-//            Enlarger enlarger = new Enlarger();
-//            addIfNotIntersects(enlarger);
-//        }
-//        if (random > 4000 && random < 4005) {
-//                InvisibilityCloak cloak = new InvisibilityCloak();
-//                addIfNotIntersects(cloak);
-//        }
     }
     private void addIfNotIntersects(Item newItem) {
         for (Item item : items) {
@@ -171,33 +154,11 @@ public class Board extends JPanel {
                         gameOver();
                     }
                 }
-            } else if (item instanceof Enlarger) {
-                if (smiley.getRect().intersects(item.getRect())) {
-                    ((Enlarger) item).consume(); //FIXME: kan tas bort?
-                    smiley.enlargen();
-                }
-                for (DevilBall devil : enemies) {
-                    if (devil.getRect().intersects(item.getRect())) {
-                        ((Enlarger) item).consume();
-                        devil.enlargen();
-                    }
-                }
             } else if (item instanceof Immortality) {
                 if (smiley.getRect().intersects(item.getRect())) {
                     ((Immortality) item).consume();
                     smiley.setImmortal();
                 }
-            } else if (item instanceof InvisibilityCloak) {
-                if (smiley.getRect().intersects(item.getRect())) {
-                    ((InvisibilityCloak) item).consume();
-                    smiley.setInvisible();
-                }
-//                for (DevilBall devil : enemies) {
-//                    if (devil.getRect().intersects(item.getRect())) {
-//                        ((InvisibilityCloak) item).consume();
-//                        devil.setInvisible();
-//                    }
-//                }
             }
         }
     }
@@ -222,30 +183,22 @@ public class Board extends JPanel {
     }
 
     private void gameOver() {
-        //EV TODO = bättre: "smiley = new Smiley". Således resetta items.
-        //                   devil = new Devil. ghost = new Ghost.
         if (! smiley.isImmortal()) {
             //inGame = false;
             //timer.cancel();
             //SHOW MENU =)
 
             smiley = new SmileyBall();
-            devil = new DevilBall(new ImageIcon("src/resources/devil1_41x41.png"));
-            ghost = new DevilBall(new ImageIcon("src/resources/ghost1_44x39-converted.png"), 100,
-                    0.1, DevilBall.getStartingSpeedLimit(), 1, 1, 130, 500);
-            enemies = new ArrayList<>();
-            enemies.add(ghost);
-            enemies.add(devil);
-            items = new ArrayList<>();
-            frenzyCounter = 0;
+            ghost = new GhostBall();
+            devil = new DevilBall();
             frenzyTimeCounter = 0;
+            frenzyCounter = 0;
 
+            items = new ArrayList<>();
             appleCounter = 0;
             birthTime = System.currentTimeMillis();
             time = birthTime;
         }
-
-        //EV todo = timer.wait(2000).
     }
     @Override
     public void paintComponent(Graphics g) {
@@ -279,16 +232,12 @@ public class Board extends JPanel {
         g2d.drawImage(apple.getImage(), apple.getX(), apple.getY(),
                 apple.getImageWidth(), apple.getImageHeight(), this);
         //Balls:
-        if (smiley.isVisible()) {
-            g2d.drawImage(smiley.getImage(), smiley.getX(), smiley.getY(),
+        g2d.drawImage(smiley.getImage(), smiley.getX(), smiley.getY(),
                     smiley.getImageWidth(), smiley.getImageHeight(), this);
-        }
-        for (DevilBall devil : enemies) {
-            if (devil.isVisible()) {
-                g2d.drawImage(devil.getImage(), devil.getX(), devil.getY(),
+        g2d.drawImage(ghost.getImage(), ghost.getX(), ghost.getY(),
+                ghost.getImageWidth(), ghost.getImageHeight(), this);
+        g2d.drawImage(devil.getImage(), devil.getX(), devil.getY(),
                         devil.getImageWidth(), devil.getImageHeight(), this);
-            }
-        }
     }
 
 }

@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public abstract class Ball {
-    protected int INIT_BALL_X;
+    protected int INIT_BALL_X; //TODO, när allt allt OK, testa göra om till package-private.
     protected int INIT_BALL_Y;
     protected double xPos;
     protected double yPos;
@@ -12,19 +12,20 @@ public abstract class Ball {
     protected int y;
     protected double xdir; //step size.
     protected double ydir; //step size.
+    //Direction of acceleration:
+    protected double xDist;
+    protected double yDist;
+    protected double distance;
+    protected double xQuota;
+    protected double yQuota;
+
+    protected double acceleration;
+    protected double friction;
+    protected double speedLimit;
 
     protected Image image;
     protected int imageWidth;
     protected int imageHeight;
-    protected boolean isVisible = true;
-
-    //Item related attributes:
-    protected boolean isInvisible = false;
-    protected boolean isEnlarged = false;
-    protected long enlargedBirthTime;
-    protected long invisibilityBirthTime;
-    protected final long stealthTime = 1000*1;
-    protected final long enlargedTime = 1000*11;
 
 
     public Ball(ImageIcon imageIcon) {
@@ -50,31 +51,40 @@ public abstract class Ball {
     protected Image getImage() { return image; }
     public int getImageWidth() { return imageWidth; }
     public int getImageHeight() { return imageHeight; }
-    public boolean isVisible() { return isVisible; }
-    public void setInvisible() {
-        isVisible = false;
-        invisibilityBirthTime = System.currentTimeMillis();
+
+
+    public void move(SmileyBall smiley) {
+        //calculate direction of acceleration.
+        xDist = smiley.getXpos() - xPos;
+        yDist = smiley.getYpos() - yPos;
+        distance = Math.sqrt(xDist * xDist + yDist * yDist);
+        xQuota = xDist / distance;
+        yQuota = yDist / distance;
+        //move:
+        xdir += xQuota * acceleration;
+        ydir += yQuota * acceleration;
+        xdir *= friction;
+        ydir *= friction;
+        restrictSpeed();
+        step();
     }
-
-
-    public void move() {
+    private void restrictSpeed() {
+        if (xdir > speedLimit) {
+            xdir = speedLimit;
+        } else if (xdir < -speedLimit) {
+            xdir = -speedLimit;
+        }
+        if (ydir > speedLimit) {
+            ydir = speedLimit;
+        } else if (ydir < -speedLimit) {
+            ydir = -speedLimit;
+        }
+    }
+    protected void step() {
         xPos += xdir;
         yPos += ydir;
         x = (int) xPos;
         y = (int) yPos;
-    }
-    //Item related:
-    public abstract void enlargen();
-    public abstract void reduce();
-    public void updateEnlarged() {
-        if (isEnlarged && (System.currentTimeMillis() - enlargedBirthTime) > enlargedTime) {
-            reduce();
-        }
-    }
-    public void updateVisibility() {
-        if ((System.currentTimeMillis() - invisibilityBirthTime) > stealthTime) {
-            isVisible = true;
-        }
     }
 
 

@@ -48,7 +48,7 @@ public class SmileyBall extends Ball {
         }
     }
     public void move() {
-        super.move();
+        super.step();
         restrictAtWalls();
     }
     private void restrictAtWalls() {
@@ -65,9 +65,7 @@ public class SmileyBall extends Ball {
     }
 
     //Item related:
-    public boolean isImmortal() {
-        return isImmortal;
-    }
+    public boolean isImmortal() { return isImmortal; }
     public void setImmortal() {
         isImmortal = true;
         immortalityBirthTime = System.currentTimeMillis();
@@ -79,20 +77,5 @@ public class SmileyBall extends Ball {
         }
     }
 
-    public void enlargen() {
-        isEnlarged = true;
-        enlargedBirthTime = System.currentTimeMillis();
-        ImageIcon ii = new ImageIcon("src/resources/smiley2_big.png");
-        image = ii.getImage();
-        imageWidth = image.getWidth(null);
-        imageHeight = image.getHeight(null);
-    }
-    public void reduce() {
-        isEnlarged = false;
-        ImageIcon ii = new ImageIcon("src/resources/smiley2_46x41.png");
-        image = ii.getImage();
-        imageWidth = image.getWidth(null);
-        imageHeight = image.getHeight(null);
-    }
 
 }
