@@ -1,16 +1,59 @@
 package AccelerationBall;
 
 import java.awt.EventQueue;
-import javax.swing.JFrame;
+import java.io.IOException;
+import java.net.URL;
+import javax.sound.sampled.*;
+import javax.swing.*;
 
 public class Game extends JFrame {
-    public static final int WIDTH = 800;
-    public static final int HEIGTH = 700;
+    public final static int WIDTH = 800;
+    public final static int HEIGTH = 700;
+    //Audio:
+    public static Clip backgroundMusic; // SIMON, om jag assignar denna till null funkar det ej. Varför?
+    public static Clip gameMusic;
+    public static Clip superMario;
+    public static Clip bounce;
+    public static Clip apple;
 
-    public Game(String title) {
+    public Game() {
+        loadAudio();
         initUI();
     }
+    private void loadAudio() {
+        try {
+            URL url = this.getClass().getClassLoader().getResource("resources/_menu_5min(wav).wav");
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
+            backgroundMusic = AudioSystem.getClip();
+            backgroundMusic.open(audioIn);
 
+            url = this.getClass().getClassLoader().getResource("resources/_game_bra2_5min(wav).wav");
+            audioIn = AudioSystem.getAudioInputStream(url);
+            gameMusic = AudioSystem.getClip();
+            gameMusic.open(audioIn);
+
+            url = this.getClass().getClassLoader().getResource("resources/_Super Mario_delayed start(wav).wav");
+            audioIn = AudioSystem.getAudioInputStream(url);
+            superMario = AudioSystem.getClip();
+            superMario.open(audioIn);
+
+            url = this.getClass().getClassLoader().getResource("resources/_1bounce_bra_loud.wav");
+            audioIn = AudioSystem.getAudioInputStream(url);
+            bounce = AudioSystem.getClip();
+            bounce.open(audioIn);
+
+            url = this.getClass().getClassLoader().getResource("resources/_apple.wav");
+            audioIn = AudioSystem.getAudioInputStream(url);
+            apple = AudioSystem.getClip();
+            apple.open(audioIn);
+        } catch (UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
+        }
+    }
     private void initUI() {
         add(new Board());
 
@@ -19,17 +62,27 @@ public class Game extends JFrame {
         setLocationRelativeTo(null); //(hmm)
         setResizable(false);
         setTitle("Acceleration Ball (TM)");
+        setIconImage((new ImageIcon("src/resources/smiley2_46x41.png").getImage()));
     }
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
-            Game game = new Game("Acceleration Ball(TM)");
+            Game game = new Game();
             game.setVisible(true);
         });
     }
 
+    public static void playBackgroundMusic() { backgroundMusic.start(); }
+    public static void stopBackgroundMusic() { backgroundMusic.stop(); }
+    public static void playGameMusic() { gameMusic.start(); }
+    public static void stopGameMusic() { gameMusic.stop(); }
+    public static void playSuperMario() { superMario.start(); }
+    public static void stopSuperMario() { superMario.stop(); }
+    public static void playBounceAudio() { bounce.start(); }
+    public static void stopBounceAudio() { bounce.stop(); }
+    public static void playAppleAudio() { apple.start(); }
+    public static void stopAppleAudio() { apple.stop(); }
 
-    //For debugging:
     public static int getLineNumber() {
         return Thread.currentThread().getStackTrace()[2].getLineNumber();
     }
@@ -71,7 +124,6 @@ public class Game extends JFrame {
             return "Gandalf time!";
         }
     }
-
 }
 
 

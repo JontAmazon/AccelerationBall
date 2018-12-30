@@ -3,8 +3,8 @@ package AccelerationBall;
 import javax.swing.*;
 
 public class GhostBall extends Ball {
-    private final double startingSpeedLimit = 0.5;
-    private final double maxSpeedLimit = 0.90;
+    private final double startingSpeedLimit = 0.70;
+    private final double maxSpeedLimit = 1;
     private final double timeToReachMaxSpeed = 1000*120;
     private boolean facesRight = true;
 
@@ -14,7 +14,7 @@ public class GhostBall extends Ball {
         INIT_BALL_X = 100;
         INIT_BALL_Y = 550;
         resetPos();
-        acceleration = 100;
+        acceleration = 0.0000100;
         friction = 0.1;
         speedLimit = startingSpeedLimit;
     }

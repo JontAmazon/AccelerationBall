@@ -10,21 +10,25 @@ import java.util.Timer;
 import javax.swing.*;
 
 public class Board extends JPanel {
-    private boolean inGame;
+    private boolean inGame = true;         //TODO = NOTE: false
     private SmileyBall smiley;
     private GhostBall ghost;
     private DevilBall devil;
     private int frenzyCounter = 0;
     private long frenzyTimeCounter = 0;
-    private long frenzyStrike = 4500;
+    private long appleLife = 4000;
 
     private Timer timer;
     private long birthTime = System.currentTimeMillis();
     private long time = birthTime;
+
+    //Images:
     ImageIcon ii = new ImageIcon("src/resources/background2.png");
     ImageIcon ii2 = new ImageIcon("src/resources/white_small.png");
+    ImageIcon ii3 = new ImageIcon("src/resources/devil1_41x41.png");
     private Image backgroundImage = ii.getImage();
     private Image whiteImage = ii2.getImage();
+    private Image menuImage = ii3.getImage();
 
     //Items:
     private ArrayList<Item> items = new ArrayList<>();
@@ -33,12 +37,15 @@ public class Board extends JPanel {
     private Random rand = new Random();
     private int random = -1;
 
+    //Audio:
+
+
 
     public Board() {
         smiley = new SmileyBall();
         ghost = new GhostBall();
         devil = new DevilBall();
-        inGame = true;
+        // inGame = true;                           Ta bort, nog.
         addKeyListener(new TAdapter());
         setFocusable(true); //(hmm)
         timer = new Timer();
@@ -47,9 +54,7 @@ public class Board extends JPanel {
     ////////////////////////////////////////////////////////////////////
     // // // // // // // // // // // // // // // // // // // // // ///
     @Override                                        ///////////////
-    public void addNotify() { //TODOO = testa ta bort.
-        super.addNotify();
-    }    ////////////
+    public void addNotify() { super.addNotify(); }    ////////////
     private class TAdapter extends KeyAdapter {
         @Override
         public void keyReleased(KeyEvent e) {
@@ -79,24 +84,28 @@ public class Board extends JPanel {
             }
     } ///////
     ////////////////////////////////////////////////////////
-    // TODO = Menu
-    // TODO = gameOver():  wait(2000).
-    // TODO = Bakgrundsmusik + Super Mario-musik + EV frenzy-musik
-    // TODO = nytt item:   halvera djävulens fart (EV ikon: grön -)
-    // TODO = implementera ny intersect().
-    // TODO = create a Ghost class.
-    // TODO = pusha
+    // TODO = Menu --> ta bort timer.cancel() i gameOver().
+    // TODO = SmileyBalls  keyPressed och keyReleased.  if-sats som kollar vilken riktning den åker mot.
+        // Om redan åker åt motsatt håll ska hastigheten inte sättas till 0...
+    // TODO = mute-knapp.
+    // TODO = apple !intersects(Fire)
+    // TODO = implement all audio:
+        // TODO = gameMusic vs. backgroundMusic i gameOver();
+        // TODO = hitta ljud:   game over
+        // TODO = hitta ljud:   "Strike 1!"
+        // TODO = hitta ljud:   Frenzy:
+            // EV snabba upp musik vid frenzy
+            // ^Note: jag kan "snabba upp den" om jag har 2 filer och kan välja var i filen jag börjar spela upp.
+            // EV hitta 1 kort ljud för det, helt enkelt.
+        // TODO = gör så att audio kan spela 2 ggr.
 
 
     private void checkCollision() {
-        if (smiley.getRect().intersects(ghost.getRect())) {
+        if (smiley.intersects(ghost) || smiley.intersects(devil)) {
             gameOver();
         }
-        if (smiley.getRect().intersects(devil.getRect())) {
-            gameOver();
-        }
-
         if (smiley.getRect().intersects(apple.getRect())) {
+            Game.playAppleAudio();
             appleCounter++;
             frenzyTimeCounter = 0;
             apple = new Apple();
@@ -112,7 +121,7 @@ public class Board extends JPanel {
         if (! devil.isInFrenzy()) {
             frenzyTimeCounter += 10;
         }
-        if (frenzyTimeCounter > frenzyStrike) {
+        if (frenzyTimeCounter > appleLife) {
             frenzyTimeCounter = 0;
             frenzyCounter++;
             apple = new Apple();
@@ -129,11 +138,11 @@ public class Board extends JPanel {
     private void generateItems() {
         random = rand.nextInt(1000000/16);
         //Intervall=100 ==> 1 item var tioende sekund.
-        if (random > 1000 && random < 1090) {
+        if (random > 1000 && random < 1120) {
             Fire fire = new Fire();
             addIfNotIntersects(fire);
         }
-        if (random > 3000 && random < 3005) {
+        if (random > 3000 && random < 3010) {
             Immortality flask = new Immortality();
             addIfNotIntersects(flask);
         }
@@ -150,12 +159,13 @@ public class Board extends JPanel {
         for (Item item : items) {
             if (item instanceof Fire) {
                 if (! ((Fire) item).isInPreStatus()) {
-                    if (smiley.getRect().intersects(item.getRect())) {
+                    if (smiley.intersects(item)) {
                         gameOver();
                     }
                 }
             } else if (item instanceof Immortality) {
                 if (smiley.getRect().intersects(item.getRect())) {
+                    Game.playSuperMario();
                     ((Immortality) item).consume();
                     smiley.setImmortal();
                 }
@@ -193,13 +203,17 @@ public class Board extends JPanel {
             devil = new DevilBall();
             frenzyTimeCounter = 0;
             frenzyCounter = 0;
-
             items = new ArrayList<>();
             appleCounter = 0;
+
+            timer.cancel();
+            timer = new Timer();
+            timer.scheduleAtFixedRate(new ScheduleTask(), 2000, 16);
             birthTime = System.currentTimeMillis();
             time = birthTime;
         }
     }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);

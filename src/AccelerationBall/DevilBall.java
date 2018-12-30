@@ -3,8 +3,8 @@ package AccelerationBall;
 import javax.swing.*;
 
 public class DevilBall extends Ball {
-    private final double normalAcceleration = 0.115;
-    private final double frenzyAcceleration = 0.115 * 1.3;
+    private final double normalAcceleration = 0.12 / 10000;
+    private final double frenzyAcceleration = 0.12 * 1.3 / 100000;
 
     private final double normalBounce = 2;
     private final double frenzyBounce = 2;
@@ -23,7 +23,7 @@ public class DevilBall extends Ball {
         INIT_BALL_Y = 150;
         resetPos();
         acceleration = normalAcceleration;
-        friction = 0.992;
+        friction = 0.99;
         speedLimit = 10;
     }
 
@@ -60,22 +60,26 @@ public class DevilBall extends Ball {
     }
     private void bounceIfAtWalls() {
         if (xPos < 0) {
+            Game.playBounceAudio();
             xPos = 0;
             xdir *= -1;
             xdir *= orthogonalBounce;
             ydir *= parallelBounce;
         } else if (xPos > Game.WIDTH - imageWidth - 15) {
+            Game.playBounceAudio();
             xPos = Game.WIDTH - imageWidth - 15;
             xdir *= -1;
             xdir *= orthogonalBounce;
             ydir *= parallelBounce;
         }
         if (yPos < 0) {
+            Game.playBounceAudio();
             yPos = 0;
             ydir *= -1;
             xdir *= parallelBounce;
             ydir *= orthogonalBounce;
         } else if (yPos > Game.HEIGTH - imageHeight - 40) {
+            Game.playBounceAudio();
             yPos = Game.HEIGTH - imageHeight - 40;
             ydir *= -1;
             xdir *= parallelBounce;

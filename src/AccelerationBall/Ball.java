@@ -1,5 +1,7 @@
 package AccelerationBall;
 
+import AccelerationBall.Items.Item;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -87,7 +89,30 @@ public abstract class Ball {
         y = (int) yPos;
     }
 
-
+    public boolean intersects(Ball ball) {
+        double thisXcenter = this.xPos + this.image.getWidth(null)/2;
+        double ballXcenter = ball.getXpos() + ball.getImage().getWidth(null)/2;
+        double thisYcenter = this.yPos + this.image.getHeight(null)/2;
+        double ballYcenter = ball.getYpos() + ball.getImage().getHeight(null)/2;
+        double distance = Math.sqrt((thisXcenter - ballXcenter)*(thisXcenter - ballXcenter)
+                + (thisYcenter - ballYcenter)*(thisYcenter - ballYcenter));
+        //Approximate an object "radius" from its square image.
+        double thisRadius = (image.getWidth(null) + image.getHeight(null)) / 4 * 0.90;
+        double ballRadius = (ball.getImage().getWidth(null) + ball.getImage().getHeight(null)) / 4 * 0.90;
+        return distance < (thisRadius + ballRadius);
+    }
+    public boolean intersects(Item item) {
+        double thisXcenter = this.xPos + this.image.getWidth(null)/2;
+        double ballXcenter = item.getX() + item.getImage().getWidth(null)/2;
+        double thisYcenter = this.yPos + this.image.getHeight(null)/2;
+        double ballYcenter = item.getY() + item.getImage().getHeight(null)/2;
+        double distance = Math.sqrt((thisXcenter - ballXcenter)*(thisXcenter - ballXcenter)
+                + (thisYcenter - ballYcenter)*(thisYcenter - ballYcenter));
+        //Approximate an object "radius" from its square image.
+        double thisRadius = (image.getWidth(null) + image.getHeight(null)) / 4 * 0.90;
+        double itemRadius = (item.getImage().getWidth(null) + item.getImage().getHeight(null)) / 4 * 0.90;
+        return distance < (thisRadius + itemRadius);
+    }
 }
 
 

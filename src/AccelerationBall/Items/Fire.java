@@ -4,7 +4,7 @@ import javax.swing.*;
 
 public class Fire extends Item {
     private boolean preStatus = true;
-    private final long preStatusChangeTime = 1000*3;
+    private static final long preStatusChangeTime = 1000*3;
     private boolean isInPreStatus1 = true;
     private boolean isInPreStatus2 = false;
     private boolean isInPreStatus3 = false;
@@ -30,7 +30,7 @@ public class Fire extends Item {
         }
 
         return preStatus;
-    } //Note: changes the 3 ring images.
+    }
 
     public long getPreStatusChangeTime() {
         return preStatusChangeTime;

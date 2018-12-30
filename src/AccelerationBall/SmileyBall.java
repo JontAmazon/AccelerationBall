@@ -4,10 +4,10 @@ import javax.swing.*;
 import java.awt.event.KeyEvent;
 
 public class SmileyBall extends Ball {
-    private double speed = 3;
+    private double speed = 3.3;
     private boolean isImmortal = false;
     private long immortalityBirthTime;
-    private final long immortalTime = 1000*10;
+    private final long immortalTime = 1000*16;
 
     public SmileyBall() {
         super(new ImageIcon("src/resources/smiley2_46x41.png"));
