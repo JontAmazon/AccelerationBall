@@ -3,6 +3,8 @@ package AccelerationBall;
 import AccelerationBall.Items.*;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.*;
@@ -10,7 +12,7 @@ import java.util.Timer;
 import javax.swing.*;
 
 public class Board extends JPanel {
-    private boolean inGame = true;         //TODO = NOTE: false
+    private static boolean inGame = false;
     private SmileyBall smiley;
     private GhostBall ghost;
     private DevilBall devil;
@@ -21,6 +23,14 @@ public class Board extends JPanel {
     private Timer timer;
     private long birthTime = System.currentTimeMillis();
     private long time = birthTime;
+    private String finalTime;
+
+    //Items:
+    private ArrayList<Item> items = new ArrayList<>();
+    private Apple apple = new Apple();
+    private Integer appleCounter = 0;
+    private Random rand = new Random();
+    private int random = -1;
 
     //Images:
     ImageIcon ii = new ImageIcon("src/resources/background2.png");
@@ -30,26 +40,19 @@ public class Board extends JPanel {
     private Image whiteImage = ii2.getImage();
     private Image menuImage = ii3.getImage();
 
-    //Items:
-    private ArrayList<Item> items = new ArrayList<>();
-    private Apple apple = new Apple();
-    private Integer appleCounter = 0;
-    private Random rand = new Random();
-    private int random = -1;
-
-    //Audio:
-
+    //Background related:
+    //private JButton playGameButton = new JButton("Play Game");
+    private JButton muteButton = new JButton("Mute");
+    private boolean isMuted = false;
 
 
     public Board() {
-        smiley = new SmileyBall();
-        ghost = new GhostBall();
-        devil = new DevilBall();
-        // inGame = true;                           Ta bort, nog.
         addKeyListener(new TAdapter());
         setFocusable(true); //(hmm)
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new ScheduleTask(), 4000, 16);
+        this.setBackground(Color.blue);
+        loadButtons();
+
+        startGame();
     }
     ////////////////////////////////////////////////////////////////////
     // // // // // // // // // // // // // // // // // // // // // ///
@@ -69,37 +72,69 @@ public class Board extends JPanel {
     private class ScheduleTask extends TimerTask {
         @Override
         public void run() {
-            time += 10;
-            smiley.move();
-            ghost.move(smiley);
-            devil.move(smiley);
-            checkCollision();
-            updateBallStatuses();
+            if (inGame) {
+                time += 10;
+                smiley.move();
+                ghost.move(smiley);
+                devil.move(smiley);
+                checkCollision();
+                updateBallStatuses();
 
-            generateItems();
-            checkItemCollisions();
-            updateItems();
+                generateItems();
+                checkItemCollisions();
+                updateItems();
+            }
 
             repaint();
-            }
+        }
     } ///////
+    private void loadButtons() {
+//        playGameButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                startGame();
+//            }
+//        });
+//        this.add(playGameButton);
+        muteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                isMuted = (! isMuted);
+                if (isMuted) {
+                    Game.stopBackgroundMusic();
+                }
+            }
+        });
+        muteButton.setLocation(20, Game.HEIGTH - 70);
+        this.add(muteButton);
+    } //TODO = button design.
+
+
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+        if (key == KeyEvent.VK_ENTER) {
+            gameOver();
+            startGame();            //ta bort gameOver()  ?
+        }
+    }           //TODO = fortsätt här. TAdaptor har keyPressed().
+
+
+
     ////////////////////////////////////////////////////////
-    // TODO = Menu --> ta bort timer.cancel() i gameOver().
-    // TODO = SmileyBalls  keyPressed och keyReleased.  if-sats som kollar vilken riktning den åker mot.
-        // Om redan åker åt motsatt håll ska hastigheten inte sättas till 0...
-    // TODO = mute-knapp.
-    // TODO = apple !intersects(Fire)
-    // TODO = implement all audio:
+    // TODO = Enter startar alltid om spelet.
+    // TODO = implement all audio, med if-satser för isMuted:
         // TODO = gameMusic vs. backgroundMusic i gameOver();
         // TODO = hitta ljud:   game over
         // TODO = hitta ljud:   "Strike 1!"
         // TODO = hitta ljud:   Frenzy:
-            // EV snabba upp musik vid frenzy
-            // ^Note: jag kan "snabba upp den" om jag har 2 filer och kan välja var i filen jag börjar spela upp.
-            // EV hitta 1 kort ljud för det, helt enkelt.
-        // TODO = gör så att audio kan spela 2 ggr.
+        // TODO = gör så att audio kan spela 2 ggr nära inpå varann.
+            //Testa att skapa ny Clip varje gång.
 
 
+    //TODO = snygg layout för bakgrunden, knappen  i mitten, mute-knapp nere till vänster, STOR titel och Apple + Time.
+    // snygg ikon för Mute. SOM ÄNDRAS!
+
+    // Methods that run every 16 ms:
     private void checkCollision() {
         if (smiley.intersects(ghost) || smiley.intersects(devil)) {
             gameOver();
@@ -108,7 +143,7 @@ public class Board extends JPanel {
             Game.playAppleAudio();
             appleCounter++;
             frenzyTimeCounter = 0;
-            apple = new Apple();
+            generateNewApple();
         }
     }
     private void updateBallStatuses() {
@@ -140,20 +175,27 @@ public class Board extends JPanel {
         //Intervall=100 ==> 1 item var tioende sekund.
         if (random > 1000 && random < 1120) {
             Fire fire = new Fire();
-            addIfNotIntersects(fire);
-        }
-        if (random > 3000 && random < 3010) {
-            Immortality flask = new Immortality();
-            addIfNotIntersects(flask);
-        }
-    }
-    private void addIfNotIntersects(Item newItem) {
-        for (Item item : items) {
-            if (newItem.getRect().intersects(item.getRect())) {
-                return;
+            if (! intersectsWithSomeItem(fire)) {
+                items.add(fire);
             }
         }
-        items.add(newItem);
+        if (random > 3000 && random < 3005) {
+            items.add(new Immortality());
+        }
+    }
+    private void generateNewApple() {
+            apple = new Apple();
+            while (intersectsWithSomeItem(apple)) {
+                apple = new Apple();
+            }
+    }
+    private boolean intersectsWithSomeItem(Item newItem) {
+        for (Item item : items) {
+            if (newItem.getRect().intersects(item.getRect())) {
+                return true;
+            }
+        }
+        return false;
     }
     private void checkItemCollisions() {
         for (Item item : items) {
@@ -194,25 +236,41 @@ public class Board extends JPanel {
 
     private void gameOver() {
         if (! smiley.isImmortal()) {
-            //inGame = false;
+            inGame = false;
+            //playGameButton.setVisible(true);                  ta bort.
+            muteButton.setVisible(true);
+            Game.stopGameMusic();
+            if (! isMuted) {
+                Game.playBackgroundMusic();
+            }
             //timer.cancel();
-            //SHOW MENU =)
-
-            smiley = new SmileyBall();
-            ghost = new GhostBall();
-            devil = new DevilBall();
-            frenzyTimeCounter = 0;
-            frenzyCounter = 0;
-            items = new ArrayList<>();
-            appleCounter = 0;
-
+            finalTime = Game.displayTime(time, birthTime);
             timer.cancel();
-            timer = new Timer();
-            timer.scheduleAtFixedRate(new ScheduleTask(), 2000, 16);
-            birthTime = System.currentTimeMillis();
-            time = birthTime;
         }
     }
+    private void startGame() {
+        inGame = true;
+        this.requestFocusInWindow();
+        //playGameButton.setVisible(false);                     ta bort.
+        muteButton.setVisible(false);
+        Game.stopBackgroundMusic();
+        if (! isMuted) {
+            Game.playGameMusic();
+        }
+
+        smiley = new SmileyBall();
+        ghost = new GhostBall();
+        devil = new DevilBall();
+        appleCounter = 0;
+        frenzyTimeCounter = 0;
+        frenzyCounter = 0;
+        items = new ArrayList<>();
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new ScheduleTask(), 1200, 16);
+        birthTime = System.currentTimeMillis();
+        time = birthTime;
+    }
+
 
     @Override
     public void paintComponent(Graphics g) {
@@ -225,8 +283,7 @@ public class Board extends JPanel {
         if (inGame) {
             drawObjects(g2d);
         } else {
-            //gameFinished(g2d);
-            //drawMenu.
+            drawMenu(g2d);
         }
         Toolkit.getDefaultToolkit().sync();
     }
@@ -252,6 +309,33 @@ public class Board extends JPanel {
                 ghost.getImageWidth(), ghost.getImageHeight(), this);
         g2d.drawImage(devil.getImage(), devil.getX(), devil.getY(),
                         devil.getImageWidth(), devil.getImageHeight(), this);
+    }
+    private void drawMenu(Graphics2D g2d) {
+        //Background:
+        g2d.drawImage(backgroundImage, 0, 0,
+                Game.WIDTH, Game.HEIGTH, this);
+
+        //Items:
+        for (Item item : items) {
+            g2d.drawImage(item.getImage(), item.getX(), item.getY(),
+                    item.getImageWidth(), item.getImageHeight(), this);
+        }
+        g2d.drawImage(apple.getImage(), apple.getX(), apple.getY(),
+                apple.getImageWidth(), apple.getImageHeight(), this);
+
+        //Balls:
+        g2d.drawImage(smiley.getImage(), smiley.getX(), smiley.getY(),
+                smiley.getImageWidth(), smiley.getImageHeight(), this);
+        g2d.drawImage(ghost.getImage(), ghost.getX(), ghost.getY(),
+                ghost.getImageWidth(), ghost.getImageHeight(), this);
+        g2d.drawImage(devil.getImage(), devil.getX(), devil.getY(),
+                devil.getImageWidth(), devil.getImageHeight(), this);
+
+        //Score:
+        g2d.drawImage(whiteImage, Game.WIDTH - 85, 0,
+                whiteImage.getWidth(null), 40, this);
+        g2d.drawString("Apples: " + appleCounter.toString(),Game.WIDTH - 80, 20);
+        g2d.drawString("Time: " + finalTime,Game.WIDTH - 80, 34);
     }
 
 }
