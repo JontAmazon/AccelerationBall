@@ -35,16 +35,24 @@ public class SmileyBall extends Ball {
     public void keyReleased (KeyEvent e){
         int key = e.getKeyCode();
         if (key == KeyEvent.VK_LEFT) {
-            xdir = 0;
+            if (xdir != speed) {
+                xdir = 0;
+            }
         }
         if (key == KeyEvent.VK_RIGHT) {
-            xdir = 0;
+            if (xdir != -speed) {
+                xdir = 0;
+            }
         }
         if (key == KeyEvent.VK_UP) {
-            ydir = 0;
+            if (ydir != speed) {
+                ydir = 0;
+            }
         }
         if (key == KeyEvent.VK_DOWN) {
-            ydir = 0;
+            if (ydir != -speed) {
+                ydir = 0;
+            }
         }
     }
     public void move() {

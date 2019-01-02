@@ -1,6 +1,8 @@
 package AccelerationBall;
 
-import java.awt.EventQueue;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URL;
 import javax.sound.sampled.*;
@@ -9,6 +11,14 @@ import javax.swing.*;
 public class Game extends JFrame {
     public final static int WIDTH = 800;
     public final static int HEIGTH = 700;
+
+    //            game.rootPane.getJMenuBar();
+//            game.rootPane.getLayeredPane();
+//            game.rootPane.getLayout();
+//            game.getJMenuBar();
+
+
+
     //Audio:
     public static Clip backgroundMusic; // SIMON, om jag assignar denna till null funkar det ej. Varför?
     public static Clip gameMusic;
@@ -76,13 +86,21 @@ public class Game extends JFrame {
     public static void stopBackgroundMusic() { backgroundMusic.stop(); }
     public static void playGameMusic() { gameMusic.start(); }
     public static void stopGameMusic() { gameMusic.stop(); }
-    public static void playSuperMario() { superMario.start(); }
+    public static void playSuperMario() {
+        bounce.setFramePosition(0);
+        superMario.start();
+    }
     public static void stopSuperMario() { superMario.stop(); }
-    public static void playBounceAudio() { bounce.start(); }
+    public static void playBounceAudio() {
+        bounce.setFramePosition(0);
+        bounce.start();
+    }
     public static void stopBounceAudio() { bounce.stop(); }
-    public static void playAppleAudio() { apple.start(); }
+    public static void playAppleAudio() {
+        apple.setFramePosition(0);
+        apple.start();
+    }
     public static void stopAppleAudio() { apple.stop(); }
-
     public static int getLineNumber() {
         return Thread.currentThread().getStackTrace()[2].getLineNumber();
     }

@@ -14,7 +14,7 @@ public class GhostBall extends Ball {
         INIT_BALL_X = 100;
         INIT_BALL_Y = 550;
         resetPos();
-        acceleration = 0.0000100;
+        acceleration = 100;
         friction = 0.1;
         speedLimit = startingSpeedLimit;
     }
