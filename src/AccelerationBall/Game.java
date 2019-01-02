@@ -82,16 +82,23 @@ public class Game extends JFrame {
         });
     }
 
-    public static void playBackgroundMusic() { backgroundMusic.start(); }
+    public static void playBackgroundMusic() {
+        backgroundMusic.setFramePosition(0);
+        backgroundMusic.start();
+    }
     public static void stopBackgroundMusic() { backgroundMusic.stop(); }
-    public static void playGameMusic() { gameMusic.start(); }
+    public static void playGameMusic() {
+        gameMusic.setFramePosition(0);
+        gameMusic.start();
+    }
     public static void stopGameMusic() { gameMusic.stop(); }
     public static void playSuperMario() {
-        bounce.setFramePosition(0);
+        superMario.setFramePosition(0);
         superMario.start();
     }
     public static void stopSuperMario() { superMario.stop(); }
     public static void playBounceAudio() {
+        bounce.stop();
         bounce.setFramePosition(0);
         bounce.start();
     }

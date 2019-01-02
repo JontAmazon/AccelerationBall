@@ -44,6 +44,7 @@ public class Board extends JPanel {
     private JLabel header;
     private JLabel appleResult;
     private JLabel timeResult;
+    //private JLabel playEnterToPlay;
     //private JButton playGameButton = new JButton("Play Game");
     private JButton muteButton = new JButton("Mute music");
     private static boolean isMuted = false;
@@ -146,16 +147,12 @@ public class Board extends JPanel {
         //Colours: green / blue   / red
         //Void methods: setEasy(), setMedium(), setHard()
     // TODO = implement all audio, med if-satser för isMuted:
-        // TODO = gameMusic vs. backgroundMusic i gameOver();
         // TODO = hitta ljud:   game over
         // TODO = hitta ljud:   "Strike 1!"
         // TODO = hitta ljud:   Frenzy:
         // TODO = gör så att audio kan spela 2 ggr nära inpå varann.
-            //Testa att skapa ny Clip varje gång.
+            //Testa att skapa ny Clip varje gång.    TODO = hur... (???)
     // TODO = Enter startar alltid om spelet.
-    // TODO = ta bort gameMusic vid Super Mario
-        // och uppdatera spelet så att gameMusic börjar OM ballen SmileyBall inte är odödlig.
-
 
     // Methods that run every 16 ms:
     private void checkCollision() {
@@ -173,7 +170,9 @@ public class Board extends JPanel {
     }
     private void updateBallStatuses() {
         smiley.updateImmortality();
-
+        if (! smiley.isImmortal()) { //EV add:   && gameMusicIsPaused()
+            Game.playGameMusic();
+        }
         ghost.turnGhosts(smiley);
         ghost.speedUp(time-birthTime);
 
@@ -233,6 +232,7 @@ public class Board extends JPanel {
             } else if (item instanceof Immortality) {
                 if (smiley.getRect().intersects(item.getRect())) {
                     if (! isMuted) {
+                        Game.stopGameMusic();
                         Game.playSuperMario();
                     }
                     ((Immortality) item).consume();
