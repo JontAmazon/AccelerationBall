@@ -18,7 +18,7 @@ public class Board extends JPanel {
     private DevilBall devil;
     private int frenzyCounter = 0;
     private long frenzyTimeCounter = 0;
-    private long appleLife = 4000;
+    private long appleLife = 5000;
 
     private Timer timer;
     private long birthTime = System.currentTimeMillis();
@@ -32,6 +32,10 @@ public class Board extends JPanel {
     private Random rand = new Random();
     private int random = -1;
 
+    //Audio related:
+    private boolean isPlayingGameMusic;
+    private boolean isPlayingSuperMario = false;
+
     //Images:
     ImageIcon ii = new ImageIcon("src/resources/background2.png");
     ImageIcon ii2 = new ImageIcon("src/resources/white_small.png");
@@ -41,15 +45,30 @@ public class Board extends JPanel {
     private Image menuImage = ii3.getImage();
 
     //Background related:
+    private JButton easyButton = new JButton("EASY");
+    private JButton mediumButton = new JButton("MEDIUM");
+    private JButton hardButton = new JButton("HARD");
+    private JButton muteButton = new JButton("Mute music");
     private JLabel header;
     private JLabel appleResult;
     private JLabel timeResult;
-    //private JLabel playEnterToPlay;
-    //private JButton playGameButton = new JButton("Play Game");
-    private JButton muteButton = new JButton("Mute music");
+    private JLabel pressEnterToPlay;
     private static boolean isMuted = false;
 
 
+    ////////////////////////////////////////////////////////
+    //////////////// TO-DO LIST ////////////////////////////
+    ////////////////////////////////////////////////////////
+    // TODO = Fixa genomskinlig färg!!! VIKTIGT!
+    // TODO = Frenzy försvinner efter 5 äpplen
+    //annars: tid för Frenzy.
+    // TODO = ersätt wav-filer med mp3.
+    // TODO = menu: EAST / MEDIUM / HARD
+    //Colours: green / blue   / red
+    //Void methods: setEasy(), setMedium(), setHard()
+
+
+    // Methods for initializing:
     public Board() {
         addKeyListener(new TAdapter());
         setFocusable(true);
@@ -59,13 +78,6 @@ public class Board extends JPanel {
         startGame();
     }
     private void loadButtons() {
-//        playGameButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                startGame();
-//            }
-//        });
-//        this.add(playGameButton);
         muteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -80,11 +92,29 @@ public class Board extends JPanel {
                 }
             }
         });
-        //setFont(Font font); (todoo)
         muteButton.setBackground(Color.BLUE);
         muteButton.setForeground(Color.RED);
         this.add(muteButton);
+
+        easyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setEasy();
+            }
+        });
+        easyButton.setBackground(Color.GREEN);
+        easyButton.setForeground(Color.BLACK);
+        this.add(easyButton);
+
+
     }
+    private void setEasy() {
+        //todo
+    }
+
+
+
+
     private void loadLabels() {
         header = new JLabel("ACCELERATION BALL (TM)");
         header.setFont(new Font("Verdana",1,36));
@@ -100,26 +130,28 @@ public class Board extends JPanel {
         timeResult.setFont(new Font("Verdana",1,12));
         timeResult.setForeground(Color.red);
         this.add(timeResult);
+
+        pressEnterToPlay = new JLabel("Press ENTER to Play!");
+        pressEnterToPlay.setFont(new Font("Verdana", 1, 11));
+        pressEnterToPlay.setForeground(Color.CYAN); //blue
+        this.add(pressEnterToPlay);
     }
     public void addNotify() { super.addNotify(); }
     private class TAdapter extends KeyAdapter {
         @Override
         public void keyReleased(KeyEvent e) {
-            smiley.keyReleased(e);
+            int key = e.getKeyCode();
+            if (key == KeyEvent.VK_ENTER) {
+                startGame();
+            } else {
+                smiley.keyReleased(e);
+            }
         }
-
         @Override
         public void keyPressed(KeyEvent e) {
             smiley.keyPressed(e);
         }
     }
-    public void keyPressed(KeyEvent e) {
-        int key = e.getKeyCode();
-        if (key == KeyEvent.VK_ENTER) {
-            gameOver();
-            startGame();            //ta bort gameOver()  ?
-        }
-    }  //TODO = fortsätt här för ENTER-todon. TAdaptor har keyPressed().
     private class ScheduleTask extends TimerTask {
         @Override
         public void run() {
@@ -140,19 +172,6 @@ public class Board extends JPanel {
         }
     }
 
-    ////////////////////////////////////////////////////////
-    //////////////// TO-DO LIST ////////////////////////////
-    ////////////////////////////////////////////////////////
-    // TODO = menu: EASY / MEDIUM / HARD
-        //Colours: green / blue   / red
-        //Void methods: setEasy(), setMedium(), setHard()
-    // TODO = implement all audio, med if-satser för isMuted:
-        // TODO = hitta ljud:   game over
-        // TODO = hitta ljud:   "Strike 1!"
-        // TODO = hitta ljud:   Frenzy:
-        // TODO = gör så att audio kan spela 2 ggr nära inpå varann.
-            //Testa att skapa ny Clip varje gång.    TODO = hur... (???)
-    // TODO = Enter startar alltid om spelet.
 
     // Methods that run every 16 ms:
     private void checkCollision() {
@@ -170,8 +189,10 @@ public class Board extends JPanel {
     }
     private void updateBallStatuses() {
         smiley.updateImmortality();
-        if (! smiley.isImmortal()) { //EV add:   && gameMusicIsPaused()
+        if (!smiley.isImmortal() && !isPlayingGameMusic) {
             Game.playGameMusic();
+            isPlayingGameMusic = true;
+            isPlayingSuperMario = false;
         }
         ghost.turnGhosts(smiley);
         ghost.speedUp(time-birthTime);
@@ -188,7 +209,7 @@ public class Board extends JPanel {
         if (frenzyCounter == 3) {
             frenzyTimeCounter = 0;
             frenzyCounter = 0;
-            devil.frenzy();
+            devil.frenzy(isMuted);
         }
         if (devil.isInFrenzy() && (time - devil.getFrenzyBirthTime()) > devil.getFrenzyTime()) {
             devil.stopFrenzy();
@@ -203,7 +224,12 @@ public class Board extends JPanel {
                 items.add(fire);
             }
         }
-        if (random > 3000 && random < 3005) {
+        if (random > 3000 && random < 3008) {
+            for (Item item : items) {
+                if (item instanceof Immortality) {
+                    break;
+                }
+            }
             items.add(new Immortality());
         }
     }
@@ -231,9 +257,11 @@ public class Board extends JPanel {
                 }
             } else if (item instanceof Immortality) {
                 if (smiley.getRect().intersects(item.getRect())) {
-                    if (! isMuted) {
+                    if (!isMuted) {
                         Game.stopGameMusic();
+                        isPlayingGameMusic = false;
                         Game.playSuperMario();
+                        isPlayingSuperMario = true;
                     }
                     ((Immortality) item).consume();
                     smiley.setImmortal();
@@ -268,6 +296,7 @@ public class Board extends JPanel {
             Game.stopGameMusic();
             if (! isMuted) {
                 Game.playBackgroundMusic();
+                Game.playGameOverAudio();
             }
             finalTime = Game.displayTime(time, birthTime);
             timer.cancel();
@@ -276,10 +305,10 @@ public class Board extends JPanel {
     private void startGame() {
         inGame = true;
         this.requestFocusInWindow();
-        //playGameButton.setVisible(false);                     ta bort.
         Game.stopBackgroundMusic();
         if (! isMuted) {
             Game.playGameMusic();
+            isPlayingGameMusic = true; //if muted: will be null.
         }
 
         smiley = new SmileyBall();
@@ -324,6 +353,7 @@ public class Board extends JPanel {
         header.setLocation(100, 25);
         muteButton.setLocation(30, Game.HEIGTH - 110);
         muteButton.setSize(110, 40);
+        pressEnterToPlay.setLocation(320, 75);
 
         //Background:
         g2d.drawImage(backgroundImage, 0, 0,
@@ -354,10 +384,11 @@ public class Board extends JPanel {
         if (inGame) {
             muteButton.setVisible(false);
             header.setVisible(false);
+            pressEnterToPlay.setVisible(false);
         } else {
             muteButton.setVisible(true);
             header.setVisible(true);
-
+            pressEnterToPlay.setVisible(true);
         }
     }
 

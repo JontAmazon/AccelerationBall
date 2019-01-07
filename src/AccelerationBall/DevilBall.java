@@ -12,7 +12,7 @@ public class DevilBall extends Ball {
 
     private final double parallelBounce = 1.18;
 
-    private final long frenzyTime = 1000*8;
+    private final long frenzyTime = 1000*2;
     private long frenzyBirthTime;
     private boolean isInFrenzy = false;
 
@@ -31,7 +31,7 @@ public class DevilBall extends Ball {
     public long getFrenzyBirthTime() { return frenzyBirthTime; }
     public long getFrenzyTime() { return frenzyTime; }
     public boolean isInFrenzy() { return isInFrenzy; }
-    public void frenzy() {
+    public void frenzy(boolean isMuted) {
         isInFrenzy = true;
         frenzyBirthTime = System.currentTimeMillis();
         orthogonalBounce = frenzyBounce;
@@ -41,6 +41,10 @@ public class DevilBall extends Ball {
         image = ii.getImage();
         imageWidth = image.getWidth(null);
         imageHeight = image.getHeight(null);
+
+        if (! isMuted) {
+            Game.playFrenzyAudio();
+        }
     }
     public void stopFrenzy() {
         isInFrenzy = false;

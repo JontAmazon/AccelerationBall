@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import javax.sound.sampled.*;
 import javax.swing.*;
@@ -12,24 +13,17 @@ public class Game extends JFrame {
     public final static int WIDTH = 800;
     public final static int HEIGTH = 700;
 
-    //            game.rootPane.getJMenuBar();
-//            game.rootPane.getLayeredPane();
-//            game.rootPane.getLayout();
-//            game.getJMenuBar();
-
-
-
-    //Audio:
-    public static Clip backgroundMusic; // SIMON, om jag assignar denna till null funkar det ej. Varför?
-    public static Clip gameMusic;
-    public static Clip superMario;
-    public static Clip bounce;
-    public static Clip apple;
+    private static Clip backgroundMusic;
+    private static Clip gameMusic;
+    private static Clip superMario;
+    private static Clip frenzy;
+    private static Clip gameOver;
 
     public Game() {
         loadAudio();
         initUI();
     }
+
     private void loadAudio() {
         try {
             URL url = this.getClass().getClassLoader().getResource("resources/_menu_5min(wav).wav");
@@ -47,15 +41,15 @@ public class Game extends JFrame {
             superMario = AudioSystem.getClip();
             superMario.open(audioIn);
 
-            url = this.getClass().getClassLoader().getResource("resources/_1bounce_bra_loud.wav");
+            url = this.getClass().getClassLoader().getResource("resources/_frenzy_cat.wav");
             audioIn = AudioSystem.getAudioInputStream(url);
-            bounce = AudioSystem.getClip();
-            bounce.open(audioIn);
+            frenzy = AudioSystem.getClip();
+            frenzy.open(audioIn);
 
-            url = this.getClass().getClassLoader().getResource("resources/_apple.wav");
+            url = this.getClass().getClassLoader().getResource("resources/_game over.wav");
             audioIn = AudioSystem.getAudioInputStream(url);
-            apple = AudioSystem.getClip();
-            apple.open(audioIn);
+            gameOver = AudioSystem.getClip();
+            gameOver.open(audioIn);
         } catch (UnsupportedAudioFileException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -96,18 +90,49 @@ public class Game extends JFrame {
         superMario.setFramePosition(0);
         superMario.start();
     }
-    public static void stopSuperMario() { superMario.stop(); }
     public static void playBounceAudio() {
-        bounce.stop();
-        bounce.setFramePosition(0);
-        bounce.start();
+        try {
+            URL url = new URL("file:/C:/Users/jonat/IdeaProjects/AccelerationBall/out/production/AccelerationBall/resources/_1bounce_bra_loud.wav");
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
+            Clip bounce = AudioSystem.getClip();
+            bounce.open(audioIn);
+            bounce.start();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
+        }
     }
-    public static void stopBounceAudio() { bounce.stop(); }
     public static void playAppleAudio() {
-        apple.setFramePosition(0);
-        apple.start();
+        try {
+            URL url = new URL("file:/C:/Users/jonat/IdeaProjects/AccelerationBall/out/production/AccelerationBall/resources/_apple.wav");
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
+            Clip apple = AudioSystem.getClip();
+            apple.open(audioIn);
+            apple.start();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
+        }
     }
-    public static void stopAppleAudio() { apple.stop(); }
+    public static void playFrenzyAudio() {
+        frenzy.setFramePosition(0);
+        frenzy.start();
+    }
+    public static void playGameOverAudio() {
+        gameOver.setFramePosition(0);
+        gameOver.start();
+    }
+
     public static int getLineNumber() {
         return Thread.currentThread().getStackTrace()[2].getLineNumber();
     }

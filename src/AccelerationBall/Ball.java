@@ -83,8 +83,16 @@ public abstract class Ball {
         }
     }
     protected void step() {
-        xPos += xdir;
-        yPos += ydir;
+        double tempXdir = xdir;
+        double tempYdir = ydir;
+        if (this instanceof SmileyBall) {
+            if (Math.abs(xdir) != 0 && Math.abs(ydir) != 0) {
+                tempXdir *= 1.32/(Math.sqrt(2));
+                tempYdir *= 1.32/(Math.sqrt(2));
+            }
+        }
+        xPos += tempXdir;
+        yPos += tempYdir;
         x = (int) xPos;
         y = (int) yPos;
     }

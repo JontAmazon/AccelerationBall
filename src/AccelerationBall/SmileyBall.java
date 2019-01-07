@@ -19,37 +19,37 @@ public class SmileyBall extends Ball {
 
     public void keyPressed (KeyEvent e){
         int key = e.getKeyCode();
-        if (key == KeyEvent.VK_LEFT) {
+        if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A || key == KeyEvent.VK_NUMPAD1) {
             xdir = -speed;
         }
-        if (key == KeyEvent.VK_RIGHT) {
+        if (key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D || key == KeyEvent.VK_NUMPAD3) {
             xdir = speed;
         }
-        if (key == KeyEvent.VK_UP) {
+        if (key == KeyEvent.VK_UP || key == KeyEvent.VK_W || key == KeyEvent.VK_NUMPAD5) {
             ydir = -speed;
         }
-        if (key == KeyEvent.VK_DOWN) {
+        if (key == KeyEvent.VK_DOWN || key == KeyEvent.VK_S || key == KeyEvent.VK_NUMPAD2) {
             ydir = speed;
         }
     }
     public void keyReleased (KeyEvent e){
         int key = e.getKeyCode();
-        if (key == KeyEvent.VK_LEFT) {
+        if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A || key == KeyEvent.VK_NUMPAD1) {
             if (xdir != speed) {
                 xdir = 0;
             }
         }
-        if (key == KeyEvent.VK_RIGHT) {
+        if (key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D || key == KeyEvent.VK_NUMPAD3) {
             if (xdir != -speed) {
                 xdir = 0;
             }
         }
-        if (key == KeyEvent.VK_UP) {
+        if (key == KeyEvent.VK_UP || key == KeyEvent.VK_W || key == KeyEvent.VK_NUMPAD5) {
             if (ydir != speed) {
                 ydir = 0;
             }
         }
-        if (key == KeyEvent.VK_DOWN) {
+        if (key == KeyEvent.VK_DOWN || key == KeyEvent.VK_S || key == KeyEvent.VK_NUMPAD2) {
             if (ydir != -speed) {
                 ydir = 0;
             }
@@ -77,11 +77,21 @@ public class SmileyBall extends Ball {
     public void setImmortal() {
         isImmortal = true;
         immortalityBirthTime = System.currentTimeMillis();
+
+        ImageIcon imageIcon = new ImageIcon("src/resources/smiley2_big.png");
+        image = imageIcon.getImage();
+        imageWidth = image.getWidth(null);
+        imageHeight = image.getHeight(null);
     }
     public void updateImmortality() {
 //        if ((System.currentTimeMillis() - immortalityBirthTime) < Board.blinkingConstant) { blink... //TODO
         if ((System.currentTimeMillis() - immortalityBirthTime) > immortalTime) {
             isImmortal = false;
+
+            ImageIcon imageIcon = new ImageIcon("src/resources/smiley2_46x41.png");
+            image = imageIcon.getImage();
+            imageWidth = image.getWidth(null);
+            imageHeight = image.getHeight(null);
         }
     }
 
