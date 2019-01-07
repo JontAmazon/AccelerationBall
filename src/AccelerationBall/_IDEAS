@@ -4,6 +4,9 @@ ________IDEAS_________________________
 - Korrekt?:
   1. Deklarera attribut som static om objekt av den klassen alltid har samma sådan. Den kan ändras, men den ändras för alla.
   2. Deklarerea attribut som public om final. Eller nä... om static final... varför krävs static?
+    ...
+        "final static" och "final" känns som samma aak...
+
 
 - Dålig?:
   public static void playBounceAudio().
@@ -16,7 +19,7 @@ ________IDEAS_________________________
 - Vid 30 äpplen kommer man till nästa värld.
 - Olika musik varje gång.
 - halvera djävulens fart
-
+- EV custom settings.
 
 
 

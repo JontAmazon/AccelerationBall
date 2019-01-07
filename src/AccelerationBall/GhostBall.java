@@ -3,9 +3,9 @@ package AccelerationBall;
 import javax.swing.*;
 
 public class GhostBall extends Ball {
-    private final double startingSpeedLimit = 0.70;
-    private final double maxSpeedLimit = 1;
-    private final double timeToReachMaxSpeed = 1000*120;
+    private double startingSpeedLimit = 0.70;
+    private double maxSpeedLimit = 1;
+    private double timeToReachMaxSpeed = 1000*120;
     private boolean facesRight = true;
 
 
@@ -14,8 +14,8 @@ public class GhostBall extends Ball {
         INIT_BALL_X = 100;
         INIT_BALL_Y = 550;
         resetPos();
-        acceleration = 100;
-        friction = 0.1;
+        acceleration = 1000;
+        friction = 0.05;
         speedLimit = startingSpeedLimit;
     }
 
@@ -27,6 +27,9 @@ public class GhostBall extends Ball {
                 speedLimit = startingSpeedLimit + age * increasePerMilliSecond;
             }
     }
+    public void setStartingSpeedLimit(double startingSpeedLimit) { this.startingSpeedLimit = startingSpeedLimit; }
+    public void setMaxSpeedLimit(double maxSpeedLimit) { this.maxSpeedLimit = maxSpeedLimit; }
+    public void setTimeToReachMaxSpeed(long time) { timeToReachMaxSpeed = time; }
     public void turnGhosts(SmileyBall smiley) {
             if (facesRight && ! shouldFaceRight(smiley)) {
                 facesRight = false;

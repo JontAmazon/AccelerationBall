@@ -56,7 +56,8 @@ public abstract class Item {
     public long getAge() {
         return (System.currentTimeMillis() - birthTime);
     }
-    public long getLife() { return lifeTime; }
+    public long getLifeTime() { return lifeTime; }
+    public void setLifeTime(long life) { lifeTime = life; }
 
     public Rectangle getRect() {
         return new Rectangle(x, y,

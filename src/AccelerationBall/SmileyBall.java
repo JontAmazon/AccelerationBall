@@ -71,6 +71,7 @@ public class SmileyBall extends Ball {
             yPos = Game.HEIGTH - imageHeight - 40;
         }
     }
+    public void setSpeed(double speed) { this.speed = speed; }
 
     //Item related:
     public boolean isImmortal() { return isImmortal; }

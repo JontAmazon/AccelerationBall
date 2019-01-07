@@ -18,8 +18,16 @@ public class Board extends JPanel {
     private DevilBall devil;
     private int frenzyCounter = 0;
     private long frenzyTimeCounter = 0;
-    private long appleLife = 5000;
 
+    //Changeable parameters (Easy / Medium / Hard)
+    private long appleLife = 5000;
+    private long fireLifeTime = 5000;
+    private int fireParameter = 165;
+    private int immortalityParameter = 10;
+    private void setAppleLife(long life) { appleLife = life; }
+    private void setFireLifeTime(long life) { fireLifeTime = life; }
+    private void setFireParameter(int nbr) { fireParameter = nbr; }
+    private void setImmortalityParameter(int nbr) { immortalityParameter = nbr; }
     private Timer timer;
     private long birthTime = System.currentTimeMillis();
     private long time = birthTime;
@@ -53,31 +61,36 @@ public class Board extends JPanel {
     private JLabel appleResult;
     private JLabel timeResult;
     private JLabel pressEnterToPlay;
-    private static boolean isMuted = false;
+    private static boolean isMuted = true;
 
 
     ////////////////////////////////////////////////////////
     //////////////// TO-DO LIST ////////////////////////////
     ////////////////////////////////////////////////////////
-    // TODO = Fixa genomskinlig färg!!! VIKTIGT!
-    // TODO = Frenzy försvinner efter 5 äpplen
-    //annars: tid för Frenzy.
-    // TODO = ersätt wav-filer med mp3.
-    // TODO = menu: EAST / MEDIUM / HARD
-    //Colours: green / blue   / red
-    //Void methods: setEasy(), setMedium(), setHard()
+    // Note: tror det blir Exception när eld dyker upp över äpple.
+    // TODO = fler items. EV osynlig.
+    // TODO = ersätt wav-filer med mp3
+    // TODO = Frenzy:
+        //efter 1-3 äpplen
+        //försvinner efter 3 äpplen12112
+    // TODO = Highscore - skriva till en fil
+        //bara 1 per person.
+    // TODO = Fixa genomskinlig färg
+
+    // TODO = fixa så att flaskor försvinnner.
 
 
     // Methods for initializing:
     public Board() {
         addKeyListener(new TAdapter());
         setFocusable(true);
-        loadButtons();
+        loadButtons(this);
         loadLabels();
 
         startGame();
+        setHard();
     }
-    private void loadButtons() {
+    private void loadButtons(JPanel jpanel) {
         muteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -90,6 +103,7 @@ public class Board extends JPanel {
                     Game.playBackgroundMusic();
                     muteButton.setText("Mute music");
                 }
+                jpanel.requestFocusInWindow();
             }
         });
         muteButton.setBackground(Color.BLUE);
@@ -100,21 +114,92 @@ public class Board extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setEasy();
+                startGame();
             }
         });
         easyButton.setBackground(Color.GREEN);
         easyButton.setForeground(Color.BLACK);
+        easyButton.setFont(new Font("Verdana", 1, 18));
         this.add(easyButton);
 
+        mediumButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setMedium();
+                startGame();
+            }
+        });
+        mediumButton.setBackground(Color.BLUE);
+        mediumButton.setForeground(Color.BLACK);
+        mediumButton.setFont(new Font("Verdana", 1, 17));
+        this.add(mediumButton);
 
+        hardButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setHard();
+                startGame();
+            }
+        });
+        hardButton.setBackground(Color.RED);
+        hardButton.setForeground(Color.BLACK);
+        hardButton.setFont(new Font("Verdana", 1, 18));
+        this.add(hardButton);
     }
     private void setEasy() {
-        //todo
+        smiley.setSpeed(3);
+        ghost.setStartingSpeedLimit(0.40);
+        ghost.setMaxSpeedLimit(0.9);
+        ghost.setTimeToReachMaxSpeed(60);
+        devil.setNormalAcceleration(0.08);
+        devil.setFrenzyAcceleration(0.08*1.3);
+        devil.setNormalOrthogonalBounce(1.8);
+        devil.setFrenzyBounce(1.85);
+        devil.setParallelBounce(1.18);
+        devil.setFriction(0.99);
+        this.setAppleLife(5*1000);
+        this.setFireLifeTime(10*1000);
+        this.setFireParameter(170);
+        this.setImmortalityParameter(12);
+
+        this.requestFocusInWindow();
     }
+    private void setMedium() {
+        smiley.setSpeed(3.2);
+        ghost.setStartingSpeedLimit(0.70);
+        ghost.setMaxSpeedLimit(1.00);
+        ghost.setTimeToReachMaxSpeed(60);
+        devil.setNormalAcceleration(0.12);
+        devil.setFrenzyAcceleration(0.12*1.3);
+        devil.setNormalOrthogonalBounce(2.0);
+        devil.setFrenzyBounce(2.05);
+        devil.setParallelBounce(1.18);
+        devil.setFriction(0.988);
+        this.setAppleLife(5*1000);
+        this.setFireLifeTime(9*1000);
+        this.setFireParameter(300);
+        this.setImmortalityParameter(8);
 
+        this.requestFocusInWindow();
+    }
+    private void setHard() {
+        smiley.setSpeed(3.4);
+        ghost.setStartingSpeedLimit(0.78);
+        ghost.setMaxSpeedLimit(1.20);
+        ghost.setTimeToReachMaxSpeed(60);
+        devil.setNormalAcceleration(0.18);
+        devil.setFrenzyAcceleration(0.18*1.3);
+        devil.setNormalOrthogonalBounce(2.0);
+        devil.setFrenzyBounce(2.05);
+        devil.setParallelBounce(1.18);
+        devil.setFriction(0.99);
+        this.setAppleLife(5*1000);
+        this.setFireLifeTime(8*1000);
+        this.setFireParameter(900);
+        this.setImmortalityParameter(7);
 
-
-
+        this.requestFocusInWindow();
+    }
     private void loadLabels() {
         header = new JLabel("ACCELERATION BALL (TM)");
         header.setFont(new Font("Verdana",1,36));
@@ -190,7 +275,9 @@ public class Board extends JPanel {
     private void updateBallStatuses() {
         smiley.updateImmortality();
         if (!smiley.isImmortal() && !isPlayingGameMusic) {
-            Game.playGameMusic();
+            if (! isMuted) {
+                Game.playGameMusic();
+            }
             isPlayingGameMusic = true;
             isPlayingSuperMario = false;
         }
@@ -218,13 +305,13 @@ public class Board extends JPanel {
     private void generateItems() {
         random = rand.nextInt(1000000/16);
         //Intervall=100 ==> 1 item var tioende sekund.
-        if (random > 1000 && random < 1165) {
-            Fire fire = new Fire();
+        if (random > 1000 && random < 1000+fireParameter) {
+            Fire fire = new Fire(fireLifeTime);
             if (! intersectsWithSomeItem(fire)) {
                 items.add(fire);
             }
         }
-        if (random > 3000 && random < 3008) {
+        if (random > 2000 && random < 2000+immortalityParameter) {
             for (Item item : items) {
                 if (item instanceof Immortality) {
                     break;
@@ -273,7 +360,7 @@ public class Board extends JPanel {
         //NOTE = includes removing consumed items.
 
         for (Item item : items) {
-            if (item.getAge() > item.getLife()) {
+            if (item.getAge() > item.getLifeTime()) {
                 item.consume();
             }
             if (item instanceof Fire && ((Fire)item).isInPreStatus() &&
@@ -351,9 +438,15 @@ public class Board extends JPanel {
         //Update positions for labels and buttons.
             //(Idk why this is requiered...)
         header.setLocation(100, 25);
+        pressEnterToPlay.setLocation(320, 75);
         muteButton.setLocation(30, Game.HEIGTH - 110);
         muteButton.setSize(110, 40);
-        pressEnterToPlay.setLocation(320, 75);
+        easyButton.setLocation(320, 105);
+        easyButton.setSize(130, 40);
+        mediumButton.setLocation(320, 150);
+        mediumButton.setSize(130, 40);
+        hardButton.setLocation(320, 195);
+        hardButton.setSize(130, 40);
 
         //Background:
         g2d.drawImage(backgroundImage, 0, 0,
@@ -383,10 +476,16 @@ public class Board extends JPanel {
     private void setComponentsVisible(boolean inGame) {
         if (inGame) {
             muteButton.setVisible(false);
+            easyButton.setVisible(false);
+            mediumButton.setVisible(false);
+            hardButton.setVisible(false);
             header.setVisible(false);
             pressEnterToPlay.setVisible(false);
         } else {
             muteButton.setVisible(true);
+            easyButton.setVisible(true);
+            mediumButton.setVisible(true);
+            hardButton.setVisible(true);
             header.setVisible(true);
             pressEnterToPlay.setVisible(true);
         }
