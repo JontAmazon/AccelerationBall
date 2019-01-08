@@ -3,14 +3,14 @@ package AccelerationBall;
 import javax.swing.*;
 
 public class DevilBall extends Ball {
-    private double normalAcceleration = 0.12;
-    private double frenzyAcceleration = 0.12 * 1.3;
+    private double normalAcceleration = 1;
+    private double frenzyAcceleration = 1;
 
-    private double normalBounce = 2;
-    private double frenzyBounce = 2;
-    private double orthogonalBounce = 2;
+    private double normalBounce = 1;
+    private double frenzyBounce = 1;
+    private double orthogonalBounce = 1;
 
-    private double parallelBounce = 1.18;
+    private double parallelBounce = 1;
 
     private final long frenzyTime = 1000*5;
     private long frenzyBirthTime;
@@ -22,9 +22,9 @@ public class DevilBall extends Ball {
         INIT_BALL_X = 100;
         INIT_BALL_Y = 150;
         resetPos();
-        acceleration = normalAcceleration;
-        friction = 0.99;
-        speedLimit = 10;
+//        acceleration = normalAcceleration;
+//        friction = 0.99;
+//        speedLimit = 10; //TODO = ta bort?
     }
 
 

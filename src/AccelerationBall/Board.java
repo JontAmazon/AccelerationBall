@@ -19,6 +19,11 @@ public class Board extends JPanel {
     private int frenzyCounter = 0;
     private long frenzyTimeCounter = 0;
 
+    // small todo = put this in a nice spot
+    private boolean easyMode;
+    private boolean mediumMode;
+    private boolean hardMode;
+
     //Changeable parameters (Easy / Medium / Hard)
     private long appleLife = 5000;
     private long fireLifeTime = 5000;
@@ -56,7 +61,7 @@ public class Board extends JPanel {
     private JButton easyButton = new JButton("EASY");
     private JButton mediumButton = new JButton("MEDIUM");
     private JButton hardButton = new JButton("HARD");
-    private JButton muteButton = new JButton("Mute music");
+    private JButton muteButton = new JButton("Un-mute");
     private JLabel header;
     private JLabel appleResult;
     private JLabel timeResult;
@@ -67,17 +72,18 @@ public class Board extends JPanel {
     ////////////////////////////////////////////////////////
     //////////////// TO-DO LIST ////////////////////////////
     ////////////////////////////////////////////////////////
-    // Note: tror det blir Exception när eld dyker upp över äpple.
-    // TODO = fler items. EV osynlig.
+    // Note: tror det blir Exception när eld dyker upp över äpple. Uppdatering: Tvek.
+    // TODO = fixa Exception och att det ibland går ubersnabbt.
+    // TODO = fler items
+        //blixt-stun-item. 5 charges.
     // TODO = ersätt wav-filer med mp3
+
     // TODO = Frenzy:
         //efter 1-3 äpplen
         //försvinner efter 3 äpplen12112
     // TODO = Highscore - skriva till en fil
         //bara 1 per person.
     // TODO = Fixa genomskinlig färg
-
-    // TODO = fixa så att flaskor försvinnner.
 
 
     // Methods for initializing:
@@ -88,7 +94,10 @@ public class Board extends JPanel {
         loadLabels();
 
         startGame();
-        setHard();
+        gameOver();
+
+        setEasy();
+        easyMode = true;
     }
     private void loadButtons(JPanel jpanel) {
         muteButton.addActionListener(new ActionListener() {
@@ -113,8 +122,9 @@ public class Board extends JPanel {
         easyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setEasy();
                 startGame();
+                setEasy();
+                easyMode = true;
             }
         });
         easyButton.setBackground(Color.GREEN);
@@ -125,8 +135,9 @@ public class Board extends JPanel {
         mediumButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setMedium();
                 startGame();
+                setMedium();
+                mediumMode = true; //TODO = behövs detta?
             }
         });
         mediumButton.setBackground(Color.BLUE);
@@ -137,8 +148,9 @@ public class Board extends JPanel {
         hardButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setHard();
                 startGame();
+                setHard();
+                hardMode = true; //TODO = behövs detta?
             }
         });
         hardButton.setBackground(Color.RED);
@@ -154,12 +166,12 @@ public class Board extends JPanel {
         devil.setNormalAcceleration(0.08);
         devil.setFrenzyAcceleration(0.08*1.3);
         devil.setNormalOrthogonalBounce(1.8);
-        devil.setFrenzyBounce(1.85);
+        devil.setFrenzyBounce(1.80);
         devil.setParallelBounce(1.18);
         devil.setFriction(0.99);
         this.setAppleLife(5*1000);
         this.setFireLifeTime(10*1000);
-        this.setFireParameter(170);
+        this.setFireParameter(200);
         this.setImmortalityParameter(12);
 
         this.requestFocusInWindow();
@@ -177,7 +189,7 @@ public class Board extends JPanel {
         devil.setFriction(0.988);
         this.setAppleLife(5*1000);
         this.setFireLifeTime(9*1000);
-        this.setFireParameter(300);
+        this.setFireParameter(500);
         this.setImmortalityParameter(8);
 
         this.requestFocusInWindow();
@@ -189,8 +201,8 @@ public class Board extends JPanel {
         ghost.setTimeToReachMaxSpeed(60);
         devil.setNormalAcceleration(0.18);
         devil.setFrenzyAcceleration(0.18*1.3);
-        devil.setNormalOrthogonalBounce(2.0);
-        devil.setFrenzyBounce(2.05);
+        devil.setNormalOrthogonalBounce(1.8);
+        devil.setFrenzyBounce(1.8);
         devil.setParallelBounce(1.18);
         devil.setFriction(0.99);
         this.setAppleLife(5*1000);
@@ -228,6 +240,13 @@ public class Board extends JPanel {
             int key = e.getKeyCode();
             if (key == KeyEvent.VK_ENTER) {
                 startGame();
+                if (easyMode) {
+                    setEasy();
+                } else if (mediumMode) {
+                    setMedium();
+                } else {
+                    setHard();
+                }
             } else {
                 smiley.keyReleased(e);
             }
