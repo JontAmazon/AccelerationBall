@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.*;
+import java.util.List;
 import java.util.Timer;
 import javax.swing.*;
 
@@ -19,20 +20,19 @@ public class Board extends JPanel {
     private int frenzyCounter = 0;
     private long frenzyTimeCounter = 0;
 
-    // small todo = put this in a nice spot
+    //Changeable parameters:
     private boolean easyMode;
     private boolean mediumMode;
     private boolean hardMode;
-
-    //Changeable parameters (Easy / Medium / Hard)
-    private long appleLife = 5000;
-    private long fireLifeTime = 5000;
-    private int fireParameter = 165;
-    private int immortalityParameter = 10;
+    private long appleLife;
+    private long fireLifeTime;
+    private int fireParameter;
+    private int immortalityParameter;
     private void setAppleLife(long life) { appleLife = life; }
     private void setFireLifeTime(long life) { fireLifeTime = life; }
     private void setFireParameter(int nbr) { fireParameter = nbr; }
     private void setImmortalityParameter(int nbr) { immortalityParameter = nbr; }
+
     private Timer timer;
     private long birthTime = System.currentTimeMillis();
     private long time = birthTime;
@@ -96,8 +96,7 @@ public class Board extends JPanel {
         startGame();
         gameOver();
 
-        setEasy();
-        easyMode = true;
+        setHard();
     }
     private void loadButtons(JPanel jpanel) {
         muteButton.addActionListener(new ActionListener() {
@@ -124,7 +123,6 @@ public class Board extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 startGame();
                 setEasy();
-                easyMode = true;
             }
         });
         easyButton.setBackground(Color.GREEN);
@@ -137,7 +135,6 @@ public class Board extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 startGame();
                 setMedium();
-                mediumMode = true; //TODO = behövs detta?
             }
         });
         mediumButton.setBackground(Color.BLUE);
@@ -150,7 +147,6 @@ public class Board extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 startGame();
                 setHard();
-                hardMode = true; //TODO = behövs detta?
             }
         });
         hardButton.setBackground(Color.RED);
@@ -158,60 +154,79 @@ public class Board extends JPanel {
         hardButton.setFont(new Font("Verdana", 1, 18));
         this.add(hardButton);
     }
+
     private void setEasy() {
+        easyMode = true;
+
         smiley.setSpeed(3);
-        ghost.setStartingSpeedLimit(0.40);
-        ghost.setMaxSpeedLimit(0.9);
-        ghost.setTimeToReachMaxSpeed(60);
-        devil.setNormalAcceleration(0.08);
-        devil.setFrenzyAcceleration(0.08*1.3);
-        devil.setNormalOrthogonalBounce(1.8);
-        devil.setFrenzyBounce(1.80);
-        devil.setParallelBounce(1.18);
+
+        ghost.setStartingSpeedLimit(0.50);
+        ghost.setSpeedLimit(0.50);
+        ghost.setMaxSpeedLimit(1.00);
+
+        devil.setNormalAcceleration(0.07);
+        devil.setFrenzyAcceleration(0.07*1.3);
+        devil.setAcceleration(0.07);
         devil.setFriction(0.99);
-        this.setAppleLife(5*1000);
+
         this.setFireLifeTime(10*1000);
         this.setFireParameter(200);
-        this.setImmortalityParameter(12);
 
-        this.requestFocusInWindow();
+        setCommonParameters();
     }
     private void setMedium() {
-        smiley.setSpeed(3.2);
-        ghost.setStartingSpeedLimit(0.70);
-        ghost.setMaxSpeedLimit(1.00);
-        ghost.setTimeToReachMaxSpeed(60);
-        devil.setNormalAcceleration(0.12);
-        devil.setFrenzyAcceleration(0.12*1.3);
-        devil.setNormalOrthogonalBounce(2.0);
-        devil.setFrenzyBounce(2.05);
-        devil.setParallelBounce(1.18);
-        devil.setFriction(0.988);
-        this.setAppleLife(5*1000);
+        mediumMode = true;
+
+        smiley.setSpeed(3.20);
+
+        ghost.setStartingSpeedLimit(0.65);
+        ghost.setSpeedLimit(0.65);
+        ghost.setMaxSpeedLimit(1.13);
+
+        devil.setNormalAcceleration(0.10);
+        devil.setFrenzyAcceleration(0.10*1.3);
+        devil.setAcceleration(0.10);
+        devil.setFriction(0.9885);
+
         this.setFireLifeTime(9*1000);
         this.setFireParameter(500);
-        this.setImmortalityParameter(8);
 
-        this.requestFocusInWindow();
+        setCommonParameters();
     }
     private void setHard() {
-        smiley.setSpeed(3.4);
-        ghost.setStartingSpeedLimit(0.78);
-        ghost.setMaxSpeedLimit(1.20);
-        ghost.setTimeToReachMaxSpeed(60);
-        devil.setNormalAcceleration(0.18);
-        devil.setFrenzyAcceleration(0.18*1.3);
-        devil.setNormalOrthogonalBounce(1.8);
-        devil.setFrenzyBounce(1.8);
-        devil.setParallelBounce(1.18);
-        devil.setFriction(0.99);
-        this.setAppleLife(5*1000);
+        hardMode = true;
+
+        smiley.setSpeed(3.40);
+
+        ghost.setStartingSpeedLimit(0.90);
+        ghost.setSpeedLimit(0.90);
+        ghost.setMaxSpeedLimit(1.25);
+
+        devil.setNormalAcceleration(0.14);
+        devil.setFrenzyAcceleration(0.14*1.3);
+        devil.setAcceleration(0.13);
+        devil.setFriction(0.985);
+
         this.setFireLifeTime(8*1000);
         this.setFireParameter(900);
-        this.setImmortalityParameter(7);
+
+        setCommonParameters();
+    }
+    private void setCommonParameters() {
+        ghost.setTimeToReachMaxSpeed(60*1000);
+
+        devil.setNormalOrthogonalBounce(1.80);
+        devil.setBounce(1.80);
+        devil.setFrenzyBounce(1.80);
+        devil.setParallelBounce(1.18);
+
+        this.setImmortalityParameter(8);
+        this.setAppleLife(5*1000);
 
         this.requestFocusInWindow();
     }
+
+
     private void loadLabels() {
         header = new JLabel("ACCELERATION BALL (TM)");
         header.setFont(new Font("Verdana",1,36));
@@ -292,6 +307,7 @@ public class Board extends JPanel {
         }
     }
     private void updateBallStatuses() {
+        //smiley:
         smiley.updateImmortality();
         if (!smiley.isImmortal() && !isPlayingGameMusic) {
             if (! isMuted) {
@@ -300,6 +316,8 @@ public class Board extends JPanel {
             isPlayingGameMusic = true;
             isPlayingSuperMario = false;
         }
+
+        //ghost:
         ghost.turnGhosts(smiley);
         ghost.speedUp(time-birthTime);
 
@@ -320,6 +338,8 @@ public class Board extends JPanel {
         if (devil.isInFrenzy() && (time - devil.getFrenzyBirthTime()) > devil.getFrenzyTime()) {
             devil.stopFrenzy();
         }
+
+
     }
     private void generateItems() {
         random = rand.nextInt(1000000/16);

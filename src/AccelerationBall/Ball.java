@@ -91,6 +91,7 @@ public abstract class Ball {
                 tempYdir *= 1.32/(Math.sqrt(2));
             }
         }
+
         xPos += tempXdir;
         yPos += tempYdir;
         x = (int) xPos;
