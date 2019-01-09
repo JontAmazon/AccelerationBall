@@ -73,17 +73,22 @@ public class Board extends JPanel {
     //////////////// TO-DO LIST ////////////////////////////
     ////////////////////////////////////////////////////////
     // Note: tror det blir Exception när eld dyker upp över äpple. Uppdatering: Tvek.
-    // TODO = fixa Exception och att det ibland går ubersnabbt.
+    // TODO = EV = Dör vid första äpplet.
     // TODO = fler items
         //blixt-stun-item. 5 charges.
     // TODO = ersätt wav-filer med mp3
-
     // TODO = Frenzy:
         //efter 1-3 äpplen
-        //försvinner efter 3 äpplen12112
+        //försvinner efter 3 äpplen
+
+    // TODO = odödlig blir opaque när 1.5 sec kvar
+    // TODO = ändra titeln. större också. annan färg?
     // TODO = Highscore - skriva till en fil
         //bara 1 per person.
-    // TODO = Fixa genomskinlig färg
+    // TODO = helskärm
+    // TODO = fixa Exception och att det ibland går ubersnabbt.
+    // TODO = äpplet blir gult 1.7 sec innan
+
 
 
     // Methods for initializing:
@@ -170,14 +175,14 @@ public class Board extends JPanel {
         devil.setFriction(0.99);
 
         this.setFireLifeTime(10*1000);
-        this.setFireParameter(200);
+        this.setFireParameter(250);
 
         setCommonParameters();
     }
     private void setMedium() {
         mediumMode = true;
 
-        smiley.setSpeed(3.20);
+        smiley.setSpeed(3.30);
 
         ghost.setStartingSpeedLimit(0.65);
         ghost.setSpeedLimit(0.65);
@@ -189,26 +194,26 @@ public class Board extends JPanel {
         devil.setFriction(0.9885);
 
         this.setFireLifeTime(9*1000);
-        this.setFireParameter(500);
+        this.setFireParameter(600);
 
         setCommonParameters();
     }
     private void setHard() {
         hardMode = true;
 
-        smiley.setSpeed(3.40);
+        smiley.setSpeed(3.60);
 
         ghost.setStartingSpeedLimit(0.90);
         ghost.setSpeedLimit(0.90);
         ghost.setMaxSpeedLimit(1.25);
 
         devil.setNormalAcceleration(0.14);
-        devil.setFrenzyAcceleration(0.14*1.3);
+        devil.setFrenzyAcceleration(0.14*1.2);
         devil.setAcceleration(0.13);
         devil.setFriction(0.985);
 
         this.setFireLifeTime(8*1000);
-        this.setFireParameter(900);
+        this.setFireParameter(1500);
 
         setCommonParameters();
     }
@@ -301,6 +306,7 @@ public class Board extends JPanel {
             if (! isMuted) {
                 Game.playAppleAudio();
             }
+            devil.setImage1();
             appleCounter++;
             frenzyTimeCounter = 0;
             generateNewApple();
@@ -346,7 +352,7 @@ public class Board extends JPanel {
         //Intervall=100 ==> 1 item var tioende sekund.
         if (random > 1000 && random < 1000+fireParameter) {
             Fire fire = new Fire(fireLifeTime);
-            if (! intersectsWithSomeItem(fire)) {
+            if (!intersectsWithSomeItem(fire) && !fire.getRect().intersects(apple.getRect())) {
                 items.add(fire);
             }
         }

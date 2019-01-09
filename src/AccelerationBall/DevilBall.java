@@ -18,7 +18,7 @@ public class DevilBall extends Ball {
 
 
     public DevilBall() {
-        super(new ImageIcon("src/resources/devil1_41x41.png"));
+        super(new ImageIcon("src/resources/devil_42x42_trans.png"));
         INIT_BALL_X = 100;
         INIT_BALL_Y = 150;
         resetPos();
@@ -46,7 +46,7 @@ public class DevilBall extends Ball {
         orthogonalBounce = frenzyBounce;
         acceleration = frenzyAcceleration;
 
-        ImageIcon ii = new ImageIcon("src/resources/devil_80x80.png");
+        ImageIcon ii = new ImageIcon("src/resources/devil_80x80_trans.png");
         image = ii.getImage();
         imageWidth = image.getWidth(null);
         imageHeight = image.getHeight(null);
@@ -60,12 +60,20 @@ public class DevilBall extends Ball {
         orthogonalBounce = normalBounce;
         acceleration = normalAcceleration;
 
-        ImageIcon ii = new ImageIcon("src/resources/devil1_41x41.png");
+        ImageIcon ii = new ImageIcon("src/resources/devil1_41x41_trans.png");
         image = ii.getImage();
         imageWidth = image.getWidth(null);
         imageHeight = image.getHeight(null);
     }
 
+    public void setImage0() {
+        ImageIcon ii = new ImageIcon("src/resources/devil_42x42_trans.png");
+        image = ii.getImage();
+    }
+    public void setImage1() {
+        ImageIcon ii = new ImageIcon("src/resources/devil1_41x41_trans.png");
+        image = ii.getImage();
+    }
 
     @Override
     public void move(SmileyBall smiley) {
@@ -75,12 +83,14 @@ public class DevilBall extends Ball {
     private void bounceIfAtWalls() {
         if (xPos < 0) {
             Board.playBounceAudio();
+            setImage0();
             xPos = 0;
             xdir *= -1;
             xdir *= orthogonalBounce;
             ydir *= parallelBounce;
         } else if (xPos > Game.WIDTH - imageWidth - 15) {
             Board.playBounceAudio();
+            setImage0();
             xPos = Game.WIDTH - imageWidth - 15;
             xdir *= -1;
             xdir *= orthogonalBounce;
@@ -88,11 +98,13 @@ public class DevilBall extends Ball {
         }
         if (yPos < 0) {
             Board.playBounceAudio();yPos = 0;
+            setImage0();
             ydir *= -1;
             xdir *= parallelBounce;
             ydir *= orthogonalBounce;
         } else if (yPos > Game.HEIGTH - imageHeight - 40) {
             Board.playBounceAudio();
+            setImage0();
             yPos = Game.HEIGTH - imageHeight - 40;
             ydir *= -1;
             xdir *= parallelBounce;

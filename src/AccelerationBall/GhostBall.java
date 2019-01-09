@@ -10,7 +10,7 @@ public class GhostBall extends Ball {
 
 
     public GhostBall() {
-        super(new ImageIcon("src/resources/ghost1_44x39-converted.png"));
+        super(new ImageIcon("src/resources/ghost1_44x39-converted_trans.png"));
         INIT_BALL_X = 100;
         INIT_BALL_Y = 550;
         resetPos();
@@ -34,14 +34,14 @@ public class GhostBall extends Ball {
             if (facesRight && ! shouldFaceRight(smiley)) {
                 facesRight = false;
                 //face left:
-                ImageIcon imageIcon = new ImageIcon("src/resources/ghost1_44x39.png");
+                ImageIcon imageIcon = new ImageIcon("src/resources/ghost1_44x39_trans.png");
                 image = imageIcon.getImage();
                 imageWidth = image.getWidth(null);
                 imageHeight = image.getHeight(null);
             } else if (!facesRight && shouldFaceRight(smiley)) {
                 facesRight = true;
                 //face right:
-                ImageIcon imageIcon = new ImageIcon("src/resources/ghost1_44x39-converted.png");
+                ImageIcon imageIcon = new ImageIcon("src/resources/ghost1_44x39-converted_trans.png");
                 image = imageIcon.getImage();
                 imageWidth = image.getWidth(null);
                 imageHeight = image.getHeight(null);

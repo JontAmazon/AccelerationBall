@@ -66,7 +66,7 @@ public class Game extends JFrame {
         setLocationRelativeTo(null); //(hmm)
         setResizable(false);
         setTitle("Acceleration Ball (TM)");
-        setIconImage((new ImageIcon("src/resources/smiley2_46x41.png").getImage()));
+        setIconImage((new ImageIcon("src/resources/smiley2_46x41_trans.png").getImage()));
     }
 
     public static void main(String[] args) {

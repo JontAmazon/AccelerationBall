@@ -87,8 +87,8 @@ public abstract class Ball {
         double tempYdir = ydir;
         if (this instanceof SmileyBall) {
             if (Math.abs(xdir) != 0 && Math.abs(ydir) != 0) {
-                tempXdir *= 1.32/(Math.sqrt(2));
-                tempYdir *= 1.32/(Math.sqrt(2));
+                tempXdir *= 1.33/(Math.sqrt(2));
+                tempYdir *= 1.33/(Math.sqrt(2));
             }
         }
 
